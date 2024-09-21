@@ -1,0 +1,21 @@
+{
+  "name": "node-js-basic",
+  "version": "1.0.0",
+  "description": "practice project",
+  "main": "app.mjs",
+  "scripts": {
+    "start": "nodemon server.mjs"
+  },
+  "author": "Husnain Ahmed",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.4.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
