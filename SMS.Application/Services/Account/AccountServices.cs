@@ -3,10 +3,10 @@ using SMS.Application.Interfaces.Accounts;
 using SMS.Application.Services.Account.Dto;
 using SMS.Domain.Entities;
 using SMS.Common.Constants;
-using SMS.Common.Enum.Database;
 using SMS.Common.Responses;
 using SMS.Application.Interfaces.Identity;
 using FluentValidation;
+using AutoMapper;
 
 
 namespace SMS.Application.Services.Account
@@ -18,9 +18,10 @@ namespace SMS.Application.Services.Account
         private readonly ICurrentUserService _currentUserService;
         private readonly IUserConfigurationService _userConfigurationService;
         private readonly ILogger<AccountService> _logger;
-       //private readonly IHeaderService _headerService;
+        private readonly IMapper _mapper;
+        //private readonly IHeaderService _headerService;
 
-        public AccountService(IIdentityService identityService, ITokenService tokenService, ILogger<AccountService> logger, ICurrentUserService currentUserService, IUserConfigurationService userConfigurationService)
+        public AccountService(IMapper mapper,IIdentityService identityService, ITokenService tokenService, ILogger<AccountService> logger, ICurrentUserService currentUserService, IUserConfigurationService userConfigurationService)
         {
             _identityService = identityService;
             _tokenService = tokenService;
@@ -28,11 +29,13 @@ namespace SMS.Application.Services.Account
             _currentUserService = currentUserService;
              //_headerService = headerService;
             _userConfigurationService = userConfigurationService;
+            _mapper= mapper;
         }
 
         public async Task<Response> ChangePasswordAsync(ChangePasswordDto model)
         {
-            var user = await _identityService.FindByIdAsync(_currentUserService.UserId.ToString());
+            string email = model.Email;
+            var user = await _identityService.FindByEmailAsync(email);      //(_currentUserService.Email.ToString());
             if (user == null)
             {
                 _logger.LogError(IdentityMessageConstants.UserNotFound);
@@ -61,22 +64,18 @@ namespace SMS.Application.Services.Account
 
         public async Task<Response<AuthenticationResponse>> CreateUserAsync(CreateUserDto model)
         {
-            var user = new ApplicationUser
-            {
-                Email = model.Email,
-                UserName = model.Email,
-               
-            };
-
+            var user = _mapper.Map<ApplicationUser>(model);
+                          
             var result = await _identityService.CreateUserAsync(user, model.Password);
-            await _identityService.AddToRoleAsync(user, new List<string> { Roles.Administrator.ToString() });
+            await _identityService.AddToRoleAsync(user, new List<string> { "ADMINISTRATION" });
+
 
             if (!result.Succeeded)
             {
                 _logger.LogError(IdentityMessageConstants.UserCreationFailed);
                 throw new ValidationException(IdentityMessageConstants.UserCreationFailed);
             }
-            await _userConfigurationService.SaveUserConfiguration(Guid.Parse(user.Id));
+            // await _userConfigurationService.SaveUserConfiguration(Guid.Parse(user.Id));
             return await _tokenService.GenerateUserTokenAsync(user);
         }
 
@@ -96,7 +95,7 @@ namespace SMS.Application.Services.Account
 
         public async Task<Response<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenDto refreshToken)
         {
-            var user = await _identityService.FindByEmailAsync(refreshToken.UserName);
+            var user = await _identityService.FindByEmailAsync(refreshToken.Email);
             if (user == null)
             {
                 _logger.LogError(IdentityMessageConstants.InvalidUserNamePassword);

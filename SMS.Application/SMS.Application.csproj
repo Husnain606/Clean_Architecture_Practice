@@ -27,8 +27,4 @@
     <ProjectReference Include="..\SMS.Domain\SMS.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Modules\" />
-  </ItemGroup>
-
 </Project>

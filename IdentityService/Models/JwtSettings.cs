@@ -2,7 +2,7 @@
 {
     public class JwtSettings
     {
-        public string Secret { get; set; } = null!;
-        public int Expiry { get; set; }
+        public string Secret { get; set; } = "hgudhudfgdhguhgudhudfgdhgudhudfgdggdhudfgdgg";
+        public int Expiry { get; set; } = 10;
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using SMS.Application;
+using SMS.Application.Mapping;
 using SMS.Domain.Entities;
 using SMS.Infrastructure.Data;
 using SMS.Presistence;
@@ -30,6 +31,12 @@ internal class Program
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+
+
+        builder.Services.AddAutoMapper(typeof(AccountMapper));
+        builder.Services.AddAutoMapper(typeof(DepartmentMapper));
+        builder.Services.AddAutoMapper(typeof(StudentMapper));
+        builder.Services.AddAutoMapper(typeof(TeacherMapper));
 
         // Add Application Services
         //builder.Services.ResolveServices(); // Ensure this method is defined correctly

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SMS.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using SMS.Infrastructure.Data;
 namespace SMS.Presistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240922075044_seed_data")]
+    partial class seed_data
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,8 +195,7 @@ namespace SMS.Presistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -216,8 +218,7 @@ namespace SMS.Presistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ModifiedBy")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -264,7 +265,7 @@ namespace SMS.Presistence.Migrations
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "95d308d0-845d-4c71-99a3-efee4f555b29",
+                            ConcurrencyStamp = "ebdd8be7-54eb-4ead-baec-a926f6465195",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "hasnain606@gmail.com",
                             EmailConfirmed = true,
@@ -272,9 +273,9 @@ namespace SMS.Presistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "HASNAIN606@GMAIL.COM",
                             NormalizedUserName = "HUSNAINAHMED",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPvC8U+q2nRlerY9bcBPyUmrEuUtMCsLeLZ8YHkg/TDQh3g5N2UB0DEKSjvMSMuBRw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBsvg4p6iV67Gp2T2PooYHaDFjeoiB+V2FjNv+tDZPGQRajGvZUKhtTEcjPTcUI2Ug==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "72c7c565-42b4-4525-89aa-4ce331081d56",
+                            SecurityStamp = "998f803f-1a32-4ffa-b20b-4c5a3fb8fdfe",
                             TwoFactorEnabled = false,
                             UserName = "HusnainAhmed"
                         });

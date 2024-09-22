@@ -38,7 +38,7 @@ namespace SMS.Presistence
 
             services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>()
                .AddDefaultTokenProviders();
-
+           // services.AddAutoMapper(typeof(AccountMapperProfile));
             // Ensure that you have the HealthChecks EF Core package installed
             services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>();
 

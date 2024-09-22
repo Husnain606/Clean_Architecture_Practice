@@ -21,6 +21,7 @@ using SMS.Application.Services.UserConfigurations.Dto;
 using SMS.Application.Services.UserConfigurations;
 using SMS.Application.Services.Account.Dto;
 using SMS.Application.Services.Account.Validator;
+using SMS.Application.Modules;
 
 namespace SMS.Application
 {
@@ -28,9 +29,18 @@ namespace SMS.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            var AccountMapper = ApplicationModule.AccountMapper();
+            var DepartmentMapper = ApplicationModule.DepartmentMapper();
+            var StudentMapper = ApplicationModule.StudentMapper();
+            var TeacherMapper = ApplicationModule.TeacherMapper();
+
             var mappingConfig = new MapperConfiguration(mc =>
             {
-              
+                mc.AddProfile(AccountMapper);
+                mc.AddProfile(DepartmentMapper);
+                mc.AddProfile(StudentMapper);
+                mc.AddProfile(TeacherMapper);
+
             });
             var mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
@@ -47,6 +57,7 @@ namespace SMS.Application
             services.AddTransient<IValidator<CreateDepartmentDto>, DepartmentValidator>();
             services.AddTransient<IValidator<CreateTeacherDto>, TeacherValidator>();
             services.AddTransient<IValidator<LoginResponseDto>, LoginResponseValidator>();
+            services.AddTransient<IValidator<CreateUserDto>, CreateUserDtoValidator>();
         }
 
         private static IServiceCollection ResolveServices(this IServiceCollection services)

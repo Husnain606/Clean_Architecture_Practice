@@ -16,5 +16,7 @@ namespace SMS.IdentityService.Services
         private string UserIdentifier => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name)!;
 
         public string UserId => string.IsNullOrWhiteSpace(UserIdentifier) ? string.Empty : (UserIdentifier);
+
+        public string Email => string.IsNullOrWhiteSpace(UserIdentifier) ? string.Empty : (UserIdentifier);
     }
 }
