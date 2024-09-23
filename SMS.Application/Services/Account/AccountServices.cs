@@ -7,7 +7,9 @@ using SMS.Common.Responses;
 using SMS.Application.Interfaces.Identity;
 using FluentValidation;
 using AutoMapper;
-
+using Microsoft.EntityFrameworkCore;
+using SMS.Application.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace SMS.Application.Services.Account
 {
@@ -16,146 +18,127 @@ namespace SMS.Application.Services.Account
         private readonly IIdentityService _identityService;
         private readonly ITokenService _tokenService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly IUserConfigurationService _userConfigurationService;
         private readonly ILogger<AccountService> _logger;
         private readonly IMapper _mapper;
-        //private readonly IHeaderService _headerService;
+        private readonly IApplicationDbContext _dbContext;
 
-        public AccountService(IMapper mapper,IIdentityService identityService, ITokenService tokenService, ILogger<AccountService> logger, ICurrentUserService currentUserService, IUserConfigurationService userConfigurationService)
+        public AccountService(IMapper mapper, IIdentityService identityService, ITokenService tokenService, ILogger<AccountService> logger, ICurrentUserService currentUserService,IApplicationDbContext dbContext)
         {
             _identityService = identityService;
             _tokenService = tokenService;
             _logger = logger;
             _currentUserService = currentUserService;
-             //_headerService = headerService;
-            _userConfigurationService = userConfigurationService;
-            _mapper= mapper;
+            _mapper = mapper;
+            _dbContext = dbContext;
         }
 
         public async Task<Response> ChangePasswordAsync(ChangePasswordDto model)
         {
-            string email = model.Email;
-            var user = await _identityService.FindByEmailAsync(email);      //(_currentUserService.Email.ToString());
-            if (user == null)
+            try
             {
-                _logger.LogError(IdentityMessageConstants.UserNotFound);
-                throw new ValidationException(IdentityMessageConstants.UserNotFound);
-            }
-            var passwordCheck = await _identityService.CheckPasswordAsync(user, model.CurrentPassword);
-            if (!passwordCheck)
-            {
-                _logger.LogError(IdentityMessageConstants.InvalidPassword);
-                throw new ValidationException(IdentityMessageConstants.InvalidPassword);
-            }
-            var result = await _identityService.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+               
+                string email = model.Email;
+                var user = await _identityService.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    _logger.LogError(IdentityMessageConstants.UserNotFound);
+                    throw new ValidationException(IdentityMessageConstants.UserNotFound);
+                }
 
-            if (!result.Succeeded)
-            {
-                _logger.LogError(IdentityMessageConstants.UnableToChangePassword);
-                throw new ValidationException(IdentityMessageConstants.UnableToChangePassword);
-            }
+                var passwordCheck = await _identityService.CheckPasswordAsync(user, model.CurrentPassword);
+                if (!passwordCheck)
+                {
+                    _logger.LogError(IdentityMessageConstants.InvalidPassword);
+                    throw new ValidationException(IdentityMessageConstants.InvalidPassword);
+                }
 
-            return new Response
+                var result = await _identityService.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                if (!result.Succeeded)
+                {
+                    _logger.LogError(IdentityMessageConstants.UnableToChangePassword);
+                    throw new ValidationException(IdentityMessageConstants.UnableToChangePassword);
+                }
+
+                return new Response
+                {
+                    Successful = true,
+                    Message = IdentityMessageConstants.PasswordChangedSuccessfully
+                };
+            }
+            catch (Exception ex)
             {
-                Successful = true,
-                Message = IdentityMessageConstants.PasswordChangedSuccessfully
-            };
+                _logger.LogError(ex, "An error occurred while changing the password.");
+                throw; // Optionally rethrow or handle the error
+            }
         }
 
         public async Task<Response<AuthenticationResponse>> CreateUserAsync(CreateUserDto model)
         {
-            var user = _mapper.Map<ApplicationUser>(model);
-                          
-            var result = await _identityService.CreateUserAsync(user, model.Password);
-            await _identityService.AddToRoleAsync(user, new List<string> { "ADMINISTRATION" });
-
-
-            if (!result.Succeeded)
+            try
             {
-                _logger.LogError(IdentityMessageConstants.UserCreationFailed);
-                throw new ValidationException(IdentityMessageConstants.UserCreationFailed);
+                 using var transaction = await _dbContext.Database.BeginTransactionAsync();     
+                var user = _mapper.Map<ApplicationUser>(model);
+                var result = await _identityService.CreateUserAsync(user, model.Password);
+                await _identityService.AddToRoleAsync(user, new List<string> { "ADMINISTRATION", "USER" });
+
+                if (!result.Succeeded)
+                {
+                    _logger.LogError(IdentityMessageConstants.UserCreationFailed);
+                    throw new ValidationException(IdentityMessageConstants.UserCreationFailed);
+                }
+                var tokenResponse = await _tokenService.GenerateUserTokenAsync(user);
+                await transaction.CommitAsync(); // Commit the transaction
+                return tokenResponse;
             }
-            // await _userConfigurationService.SaveUserConfiguration(Guid.Parse(user.Id));
-            return await _tokenService.GenerateUserTokenAsync(user);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating a user.");
+                throw; // Optionally rethrow or handle the error
+            }
         }
 
         public async Task<Response<AuthenticationResponse>> LoginUserAsync(LoginDto model)
         {
-            var user = await _identityService.FindByEmailAsync(model.Email);
-            if (user == null)
+            try
             {
-                _logger.LogError(IdentityMessageConstants.InvalidUserNamePassword);
-                throw new ValidationException(IdentityMessageConstants.InvalidUserNamePassword);
+                var user = await _identityService.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    _logger.LogError(IdentityMessageConstants.InvalidUserNamePassword);
+                    throw new ValidationException(IdentityMessageConstants.InvalidUserNamePassword);
+                }
+
+                var passwordCheck = await _identityService.CheckPasswordAsync(user, model.Password);
+                if (!passwordCheck)
+                    throw new ValidationException(IdentityMessageConstants.InvalidUserNamePassword);
+
+                return await _tokenService.GenerateUserTokenAsync(user);
             }
-            var passwordCheck = await _identityService.CheckPasswordAsync(user, model.Password);
-            if (!passwordCheck)
-                throw new ValidationException(IdentityMessageConstants.InvalidUserNamePassword);
-            return await _tokenService.GenerateUserTokenAsync(user);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during user login.");
+                throw; // Optionally rethrow or handle the error
+            }
         }
 
         public async Task<Response<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenDto refreshToken)
         {
-            var user = await _identityService.FindByEmailAsync(refreshToken.Email);
-            if (user == null)
+            try
             {
-                _logger.LogError(IdentityMessageConstants.InvalidUserNamePassword);
-                throw new ValidationException(IdentityMessageConstants.InvalidUserNamePassword);
-            }
+                var user = await _identityService.FindByEmailAsync(refreshToken.Email);
+                if (user == null)
+                {
+                    _logger.LogError(IdentityMessageConstants.InvalidUserNamePassword);
+                    throw new ValidationException(IdentityMessageConstants.InvalidUserNamePassword);
+                }
 
-            return await _tokenService.GenerateUserTokenAsync(user);
+                return await _tokenService.GenerateUserTokenAsync(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while refreshing the token.");
+                throw; // Optionally rethrow or handle the error
+            }
         }
     }
 }
-//public class AccountServices : IAccountService
-//{
-//    private readonly IConfiguration _configuration;
-//    private readonly ILogger<AccountServices> _logger;
-
-//    public AccountServices(IConfiguration configuration, ILogger<AccountServices> logger)
-//    {
-//        _configuration = configuration;
-//        _logger = logger;
-//    }
-//    public async Task<LoginResponseDto> LoginUser(LoginDto model)
-//    {
-//        try
-//        {
-//            if (model == null)
-//            {
-//                throw new ArgumentException("Invalid model", nameof(model));
-//            }
-//            LoginResponseDto response = new() { Username = model.Username };
-//            if (model.Username == "Husnain" && model.Password == "nani@606")
-//            {
-//                var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTSecret"));
-//                var tokenHandler = new JwtSecurityTokenHandler();
-//                var tokenDescription = new SecurityTokenDescriptor()
-//                {
-//                    Subject = new ClaimsIdentity(new Claim[]
-//                    { 
-//                //Username
-//                new Claim(ClaimTypes.Name, model.Username),
-//                //Role
-//                new Claim(ClaimTypes.Role,"Teacher")
-//                    }),
-//                    Expires = DateTime.Now.AddHours(5),
-//                    NotBefore = DateTime.Now.AddSeconds(-1),
-//                    SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)
-//                };
-//                var token = tokenHandler.CreateToken(tokenDescription);
-//                response.Token = tokenHandler.WriteToken(token);
-//            }
-//            else
-//            {
-//                throw new ArgumentException("Invalid model", nameof(model));
-//            }
-//            return  response ;
-//        }
-//        catch (Exception ex)
-//        {
-//            _logger.LogError(ex, "Error occurred while creating student.");
-//            throw ex;
-//        }
-//    }
-//}
-

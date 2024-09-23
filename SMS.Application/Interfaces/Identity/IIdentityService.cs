@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SMS.Domain.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SMS.Application.Interfaces.Identity
 {
@@ -18,5 +20,7 @@ namespace SMS.Application.Interfaces.Identity
         Task<IdentityResult> AddToRoleAsync(ApplicationUser user, List<string> roles);
 
         Task<IdentityResult> ChangePasswordAsync(ApplicationUser user, string currentPassword, string newPassword);
+
+        Task<List<ApplicationUser>> GetAllUsersAsync();
     }
 }

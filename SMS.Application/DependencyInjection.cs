@@ -22,6 +22,8 @@ using SMS.Application.Services.UserConfigurations;
 using SMS.Application.Services.Account.Dto;
 using SMS.Application.Services.Account.Validator;
 using SMS.Application.Modules;
+using SMS.Application.Interfaces.Email;
+using SMS.Application.Services.Email;
 
 namespace SMS.Application
 {
@@ -67,6 +69,7 @@ namespace SMS.Application
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<ITeacherService, TeacherService>();
+            services.AddScoped<IEmailService, EmailService>();
             return services;
         }
 

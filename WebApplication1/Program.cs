@@ -32,12 +32,6 @@ internal class Program
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
-
-        builder.Services.AddAutoMapper(typeof(AccountMapper));
-        builder.Services.AddAutoMapper(typeof(DepartmentMapper));
-        builder.Services.AddAutoMapper(typeof(StudentMapper));
-        builder.Services.AddAutoMapper(typeof(TeacherMapper));
-
         // Add Application Services
         //builder.Services.ResolveServices(); // Ensure this method is defined correctly
         builder.Services.AddApplication(); // Ensure this extension method is defined

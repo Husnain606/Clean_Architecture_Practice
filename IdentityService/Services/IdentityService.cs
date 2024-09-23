@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SMS.Application.Interfaces.Identity;
 using SMS.Domain.Entities;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace SMS.IdentityService.Services
 {
     public class IdentityService : IIdentityService
@@ -45,6 +49,10 @@ namespace SMS.IdentityService.Services
         public Task<IdentityResult> AddToRoleAsync(ApplicationUser user, List<string> roles)
         {
             return _userManager.AddToRolesAsync(user, roles);
+        }
+        public async Task<List<ApplicationUser>> GetAllUsersAsync()
+        {
+            return await _userManager.Users.ToListAsync();
         }
     }
 }
