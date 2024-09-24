@@ -17,17 +17,17 @@ namespace SMS.Application.Services.Account
     {
         private readonly IIdentityService _identityService;
         private readonly ITokenService _tokenService;
-        private readonly ICurrentUserService _currentUserService;
+     //   private readonly ICurrentUserService _currentUserService;
         private readonly ILogger<AccountService> _logger;
         private readonly IMapper _mapper;
         private readonly IApplicationDbContext _dbContext;
 
-        public AccountService(IMapper mapper, IIdentityService identityService, ITokenService tokenService, ILogger<AccountService> logger, ICurrentUserService currentUserService,IApplicationDbContext dbContext)
+        public AccountService(IMapper mapper, IIdentityService identityService, ITokenService tokenService, ILogger<AccountService> logger, IApplicationDbContext dbContext)
         {
             _identityService = identityService;
             _tokenService = tokenService;
             _logger = logger;
-            _currentUserService = currentUserService;
+          //  _currentUserService = currentUserService;
             _mapper = mapper;
             _dbContext = dbContext;
         }

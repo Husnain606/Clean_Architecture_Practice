@@ -39,5 +39,29 @@ namespace WebApplication1.Controllers
              var model =await _emailService.SendEmailToAllUsersAsync(subject, body);
             return Ok(model);
         }
+
+        // Endpoint to read emails from the inbox
+        [HttpGet("inbox")]
+        public async Task<IActionResult> ReadInboxEmails()
+        {
+            var emails = await _emailService.ReadInboxEmailsAsync();
+            return Ok(emails);
+        }
+
+        // Endpoint to read sent emails
+        [HttpGet("sent")]
+        public async Task<IActionResult> ReadSentEmails()
+        {
+            var emails = await _emailService.ReadSentEmailsAsync();
+            return Ok(emails);
+        }
+
+        // Endpoint to read draft emails
+        [HttpGet("drafts")]
+        public async Task<IActionResult> ReadDraftEmails()
+        {
+            var emails = await _emailService.ReadDraftEmailsAsync();
+            return Ok(emails);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SMS.Common.ViewModels;
+﻿using MimeKit;
+using SMS.Common.ViewModels;
 
 namespace SMS.Application.Interfaces.Email
 {
@@ -7,5 +8,8 @@ namespace SMS.Application.Interfaces.Email
         Task<ResponseModel> SendEmailAsync(string recipientEmail, string subject, string body);
         Task<ResponseModel> SendEmailToUserAsync(string userName, string subject, string body);
         Task<ResponseModel> SendEmailToAllUsersAsync(string subject, string body);
+        Task<List<EmailResponseModel>> ReadInboxEmailsAsync();
+        Task<List<EmailResponseModel>> ReadSentEmailsAsync();
+        Task<List<EmailResponseModel>> ReadDraftEmailsAsync();
     }
 }
