@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using SMS.Application.Interfaces.Students;
 using SMS.Application.Services.Students.Dto;
 using Microsoft.AspNetCore.Authorization;
+using SMS.Application.Services.Common;
+using SMS.Common.ViewModels;
 
 namespace WebApplication1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Teacher")]
+    
     public class StudentController : ControllerBase
     {
 
@@ -23,14 +25,14 @@ namespace WebApplication1.Controllers
             _logger = logger;
             studentServices = _studentServices;
         }
-
+        [AllowAnonymous]
         // GET ALL STUDENT
         [HttpGet("GetAllStudents")]
-        public async Task<IActionResult> GetAllStudents()
+        public async Task<ActionResult<ResponseModel<GridDto<StudentDto>>>> GetAllStudents([FromQuery] StudentRequestDto request)
         {
             try
             {
-                var students = await studentServices.GetStudentListAsync();
+                var students = await studentServices.GetStudentListAsync(request);
                 if (students == null) return NotFound();
                 return Ok(students);
             }

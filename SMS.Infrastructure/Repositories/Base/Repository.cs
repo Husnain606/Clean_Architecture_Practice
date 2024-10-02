@@ -43,7 +43,7 @@ namespace SMS.Infrastructure.Repositories.Base
         {
             try
             {
-                return await _dbContext.Set<T>().ToListAsync();
+                return await _dbContext.Set<T>().AsQueryable().ToListAsync();
             }
             catch (Exception)
             {

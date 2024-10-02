@@ -79,7 +79,7 @@ namespace SMS.Application.Services.Account
                  using var transaction = await _dbContext.Database.BeginTransactionAsync();     
                 var user = _mapper.Map<ApplicationUser>(model);
                 var result = await _identityService.CreateUserAsync(user, model.Password);
-                await _identityService.AddToRoleAsync(user, new List<string> { "ADMINISTRATION", "USER" });
+                await _identityService.AddToRoleAsync(user, new List<string> { "ADMINISTRATION" });
 
                 if (!result.Succeeded)
                 {

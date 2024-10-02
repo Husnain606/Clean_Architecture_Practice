@@ -8,12 +8,12 @@ namespace SMS.Application.Interfaces.Students
          * Create IStudentGetMethods interface rather then
          * put all the joins and groups method declaration
          * in single interface IStudentServices*/
-        Task<List<StudentDto>> InnerJoin();
-        Task<List<StudentDto>> GetLeftOuterJoinFields();
-        Task<List<StudentDto>> GetRightOuterJoinFields();
-        Task<List<StudentDto>> GetLeftInnerJoinFields();
-        Task<List<StudentDto>> GetRightInnerJoinFields();
-        Task<List<StudentDto>> GetGroupJoinFields();
+        Task<List<StudentRequestDto>> InnerJoin();
+        Task<List<StudentRequestDto>> GetLeftOuterJoinFields();
+        Task<List<StudentRequestDto>> GetRightOuterJoinFields();
+        Task<List<StudentRequestDto>> GetLeftInnerJoinFields();
+        Task<List<StudentRequestDto>> GetRightInnerJoinFields();
+        Task<List<StudentRequestDto>> GetGroupJoinFields();
         Task<List<GroupedStudentsDTO>> GroupByDepartment();
     }
 }

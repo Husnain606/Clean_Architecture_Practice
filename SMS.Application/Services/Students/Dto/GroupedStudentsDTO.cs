@@ -3,6 +3,6 @@
     public class GroupedStudentsDTO
     {
         public Guid DepartmentId { get; set; }
-        public List<StudentDto> Students { get; set; }
+        public List<StudentRequestDto> Students { get; set; }
     }
 }

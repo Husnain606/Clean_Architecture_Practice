@@ -2,11 +2,17 @@
 
 namespace SMS.Common.ViewModels
 {
+    public class ResponseModel<T> : ResponseModel
+    {
+        public T? Result { get; set; }
+    }
+
     public class ResponseModel
     {
-        public bool IsSuccess {  get;  set; }
-        public HttpStatusCode StatusCode { get; set; }
+        public bool IsSuccess { get; set; }
+        public string? Messsage { get; set; }
         public dynamic data { get; set; }
-        public string Messsage  { get; set; } = string.Empty;
+        public HttpStatusCode StatusCode { get; set; }
+        public IEnumerable<string>? Errors { get; set; }
     }
 }

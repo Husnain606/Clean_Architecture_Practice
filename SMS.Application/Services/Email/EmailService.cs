@@ -216,7 +216,7 @@ namespace SMS.Application.Services.Email
 
                     emailList.Add(emailResponse);
                     count++;
-                    if (count == 8) break; // Limit to the first 4 emails
+                    if (count == 4) break; // Limit to the first 4 emails
                 }
 
                 await client.DisconnectAsync(true);

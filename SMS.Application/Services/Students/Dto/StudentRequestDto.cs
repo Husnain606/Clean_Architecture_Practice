@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SMS.Application.Services.Common;
 
 namespace SMS.Application.Services.Students.Dto
 {
-    public class StudentDto
+    public class StudentRequestDto : PageSortDto
     {
-
         public string Name { get; set; } = string.Empty;
         public string StudentFatherName { get; set; } = string.Empty;
         public string Class { get; set; } = string.Empty;

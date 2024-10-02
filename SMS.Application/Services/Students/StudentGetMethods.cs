@@ -27,7 +27,7 @@ namespace SMS.Application.Services.Students
 
         }
         // GET DETAIL BY SPECIFICATION
-        public async Task<List<StudentDto>> InnerJoin()
+        public async Task<List<StudentRequestDto>> InnerJoin()
         {
             try
             {
@@ -36,7 +36,7 @@ namespace SMS.Application.Services.Students
                     .AsNoTracking()
                     .ToListAsync();
 
-                var result = studentsWithDepartments.Select(student => new StudentDto
+                var result = studentsWithDepartments.Select(student => new StudentRequestDto
                 {
                     Name = student.StudentFirstName,
                     Age = student.Age,
@@ -53,7 +53,7 @@ namespace SMS.Application.Services.Students
         }
 
         //Get Left Outer Join Fields
-        public async Task<List<StudentDto>> GetLeftOuterJoinFields()
+        public async Task<List<StudentRequestDto>> GetLeftOuterJoinFields()
         {
             try
             {
@@ -62,7 +62,7 @@ namespace SMS.Application.Services.Students
                     .AsNoTracking()
                     .ToListAsync();
 
-                var result = studentsWithDepartments.Select(student => new StudentDto
+                var result = studentsWithDepartments.Select(student => new StudentRequestDto
                 {
                     Name = student.StudentFirstName,
                     Age = student.Age,
@@ -79,7 +79,7 @@ namespace SMS.Application.Services.Students
         }
 
         // Get Right Outer Join Fields
-        public async Task<List<StudentDto>> GetRightOuterJoinFields()
+        public async Task<List<StudentRequestDto>> GetRightOuterJoinFields()
         {
             try
             {
@@ -103,7 +103,7 @@ namespace SMS.Application.Services.Students
                                      };
 
                 // Map the results to StudentDto
-                var result = rightOuterJoin.Select(x => new StudentDto
+                var result = rightOuterJoin.Select(x => new StudentRequestDto
                 {
                     Name = x.StudentFirstName ?? "No Student",
                     Age = x.Age ?? 0,
@@ -118,7 +118,7 @@ namespace SMS.Application.Services.Students
             }
         }
         //Get Left Inner Join Fields
-        public async Task<List<StudentDto>> GetLeftInnerJoinFields()
+        public async Task<List<StudentRequestDto>> GetLeftInnerJoinFields()
         {
             try
             {
@@ -128,7 +128,7 @@ namespace SMS.Application.Services.Students
                     .Where(s => s.Department != null) // Inner join condition
                     .ToListAsync();
 
-                var result = studentsWithDepartments.Select(student => new StudentDto
+                var result = studentsWithDepartments.Select(student => new StudentRequestDto
                 {
                     Name = student.StudentFirstName,
                     Age = student.Age,
@@ -145,7 +145,7 @@ namespace SMS.Application.Services.Students
         }
 
         //Get Right Inner Join Fields
-        public async Task<List<StudentDto>> GetRightInnerJoinFields()
+        public async Task<List<StudentRequestDto>> GetRightInnerJoinFields()
         {
             try
             {
@@ -165,7 +165,7 @@ namespace SMS.Application.Services.Students
                             department.DepartmenrDescription
                         })
                     .ToList();
-                var result = innerJoin.Select(x => new StudentDto
+                var result = innerJoin.Select(x => new StudentRequestDto
                 {
                     Name = x.StudentFirstName,
                     Age = x.Age,
@@ -180,7 +180,7 @@ namespace SMS.Application.Services.Students
             }
         }
         //   Get Group Join Fields
-        public async Task<List<StudentDto>> GetGroupJoinFields()
+        public async Task<List<StudentRequestDto>> GetGroupJoinFields()
         {
             try
             {
@@ -189,7 +189,7 @@ namespace SMS.Application.Services.Students
                     .AsNoTracking()
                     .ToListAsync();
 
-                var result = studentsWithDepartments.Select(student => new StudentDto
+                var result = studentsWithDepartments.Select(student => new StudentRequestDto
                 {
                     Name = student.StudentFirstName,
                     Age = student.Age,
@@ -220,7 +220,7 @@ namespace SMS.Application.Services.Students
                     .Select(group => new GroupedStudentsDTO
                     {
                         DepartmentId = group.Key,
-                        Students = group.Select(student => new StudentDto
+                        Students = group.Select(student => new StudentRequestDto
                         {
                             Name = student.StudentFirstName + " " + student.StudentLastName,
                             Mail = student.Mail,

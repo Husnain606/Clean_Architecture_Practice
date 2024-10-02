@@ -9,6 +9,10 @@ using SMS.Common.Utilities;
 using SMS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SMS.Application.Services.Students.Validators;
+using SMS.Application.Services.Common;
+using System.Linq.Dynamic.Core;
+using SMS.Common.Extensions;
+using AutoMapper.QueryableExtensions;
 
 namespace SMS.Application.Services.Students
 {
@@ -63,21 +67,26 @@ namespace SMS.Application.Services.Students
             return model;
         }
 
-        // GET THE LIST OF ALL STUDENTS
-        public async Task<ResponseModel> GetStudentListAsync()
+        // GET THE LIST OF ALL STUDENTS WITH PAGINATION
+        public async Task<ResponseModel<GridDto<StudentDto>>> GetStudentListAsync(StudentRequestDto request)
         {
             try
             {
-                ResponseModel model = new ResponseModel();
-                _logger.LogInformation("Getting all the students executed !!");
-                var students = await _studentRepository.GetAllAsync();
-                if (students == null) return null;
-                var studentDTOs = _mapper.Map<List<StudentDto>>(students);
-                model.data = studentDTOs;
-                model.IsSuccess = true;
-                model.StatusCode=System.Net.HttpStatusCode.OK;
+                ResponseModel responsemodel = new ResponseModel();
+                var paging = new GridDto<StudentDto>(); // Changed to StudentDto
+                _logger.LogInformation($"{nameof(GetStudentListAsync)} {ApplicationLogsConstants.MethodRunning}");
+                IQueryable<Student> students = GetStudentQuery(request);
+                _logger.LogInformation("Getting all the students executed with pagination !!");
 
-                return model;
+                paging.TotalRecords = await students.CountAsync();
+                paging.Data = await students.PageBy(request.PageNumber, request.PageSize)
+                    .ProjectTo<StudentDto>(_mapper.ConfigurationProvider).ToListAsync();
+
+
+                _logger.LogInformation($"{nameof(StudentDto)} {ApplicationLogsConstants.MethodExecuted}");
+
+                // Return the result with StudentDto paging
+                return new ResponseModel<GridDto<StudentDto>> { IsSuccess = true, Result = paging };
             }
             catch (Exception ex)
             {
@@ -85,6 +94,14 @@ namespace SMS.Application.Services.Students
                 throw;
             }
         }
+
+        private IQueryable<Student> GetStudentQuery(StudentRequestDto request)
+        {
+            return _studentRepository.TableNoTracking.TagWith("GetStudentQuery")
+                  .OrderByIf(!string.IsNullOrEmpty(request.SortBy), request.SortBy!, request.SortOrder)
+                  .OrderByIf(string.IsNullOrEmpty(request.SortBy), x => x.StudentFirstName);
+        }
+
 
         // GET STUDENT DETAILS BY STUDENT ID
         public async Task<ResponseModel> GetStudentDetailsByIdAsync(Guid studentId)
@@ -98,8 +115,8 @@ namespace SMS.Application.Services.Students
                     _logger.LogInformation(StudentConstants.notFound);
                     return null;
                 }
-                var studentDTO = _mapper.Map<StudentDto>(student);
-                studentDTO.timespann = CheckTime.GetTimeDifference(student.EnrollmentDate);
+                var studentDTO = _mapper.Map<StudentRequestDto>(student);
+                //studentDTO.timespann = CheckTime.GetTimeDifference(student.EnrollmentDate);
 
                 model.data = studentDTO;
                 model.IsSuccess = true;
@@ -168,14 +185,14 @@ namespace SMS.Application.Services.Students
             return model;
         }
         // GET DETAIL BY SPECIFICATION
-        public async Task<List<StudentDto>> GetStudentDetailsByAgeG13Async(int age)
+        public async Task<List<StudentRequestDto>> GetStudentDetailsByAgeG13Async(int age)
         {
             try
             {
                 var students = await _studentRepository.Table.Where(s => s.Age == age).Distinct().ToListAsync();
                 if (students == null) return null;
 
-                var studentDTOs = _mapper.Map<List<StudentDto>>(students);
+                var studentDTOs = _mapper.Map<List<StudentRequestDto>>(students);
                 return studentDTOs;
             }
             catch (Exception ex)

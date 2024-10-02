@@ -42,7 +42,7 @@ namespace SMS.IdentityService.Services
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(_jwtSettings.Expiry),
                 SigningCredentials =
-                   new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                   new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);

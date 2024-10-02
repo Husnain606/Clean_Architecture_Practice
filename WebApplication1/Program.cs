@@ -1,3 +1,4 @@
+using IdentityService.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -39,21 +40,24 @@ internal class Program
 
         builder.Services.AddAuthorization();
         builder.Services.AddControllers();
+        JwtSettings _jwtSettings = new JwtSettings();
         // Configure JWT Authentication
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
+        })
+        .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false;
-            options.SaveToken = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWTSecret"])),
-                ValidateIssuer = false,
-                ValidateAudience = false
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)),
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero // To prevent issues with slight clock drift
+
             };
         });
 
@@ -93,16 +97,28 @@ internal class Program
         // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseDeveloperExceptionPage();  // Developer Exception Page for detailed error information in development mode
         }
 
-        app.UseHttpsRedirection();
-        app.UseAuthentication();
-        app.UseAuthorization();
+        app.UseSwagger();  // Enable Swagger middleware
+        app.UseSwaggerUI(c =>  // Configure Swagger UI
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+        });
 
-        app.MapControllers();
+        app.UseHttpsRedirection();  // Enforce HTTPS
 
-        app.Run();
+        app.UseRouting();  // Enable routing
+
+        app.UseAuthentication();  // Enable authentication middleware
+        app.UseAuthorization();   // Enable authorization middleware
+
+        app.UseEndpoints(endpoints =>  // Map controllers to endpoints
+        {
+            endpoints.MapControllers();
+        });
+
+        app.Run();  // Start the application
+
     }
 }

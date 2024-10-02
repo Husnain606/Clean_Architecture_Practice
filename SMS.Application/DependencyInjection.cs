@@ -24,6 +24,8 @@ using SMS.Application.Services.Account.Validator;
 using SMS.Application.Modules;
 using SMS.Application.Interfaces.Email;
 using SMS.Application.Services.Email;
+using SMS.Application.Interfaces.Excel;
+using SMS.Application.Services.Excel;
 
 namespace SMS.Application
 {
@@ -70,6 +72,7 @@ namespace SMS.Application
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<ITeacherService, TeacherService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IExcelService, ExcelService>();
             return services;
         }
 
