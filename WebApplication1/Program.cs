@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using SMS.Application;
-using SMS.Application.Mapping;
 using SMS.Domain.Entities;
 using SMS.Infrastructure.Data;
 using SMS.Presistence;
@@ -34,13 +33,14 @@ internal class Program
             .AddDefaultTokenProviders();
 
         // Add Application Services
-        //builder.Services.ResolveServices(); // Ensure this method is defined correctly
         builder.Services.AddApplication(); // Ensure this extension method is defined
         builder.Services.AddPlanningPortalPersistence(builder.Configuration);
 
         builder.Services.AddAuthorization();
         builder.Services.AddControllers();
+
         JwtSettings _jwtSettings = new JwtSettings();
+
         // Configure JWT Authentication
         builder.Services.AddAuthentication(options =>
         {
@@ -57,9 +57,18 @@ internal class Program
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero // To prevent issues with slight clock drift
-
             };
         });
+
+        // Enable CORS for the Angular app
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin",
+			  builder => builder.WithOrigins("http://localhost:4200") // Your Angular app URL
+						  .AllowAnyHeader()
+						  .AllowAnyMethod());
+
+		});
 
         // Configure Swagger/OpenAPI
         builder.Services.AddEndpointsApiExplorer();
@@ -110,6 +119,9 @@ internal class Program
 
         app.UseRouting();  // Enable routing
 
+        // Enable CORS for Angular app
+        app.UseCors("AllowSpecificOrigin");
+
         app.UseAuthentication();  // Enable authentication middleware
         app.UseAuthorization();   // Enable authorization middleware
 
@@ -119,6 +131,5 @@ internal class Program
         });
 
         app.Run();  // Start the application
-
     }
 }

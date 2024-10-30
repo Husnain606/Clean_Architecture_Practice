@@ -7,9 +7,7 @@ using SMS.Common.Responses;
 using SMS.Application.Interfaces.Identity;
 using FluentValidation;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using SMS.Application.Interfaces;
-using Microsoft.AspNetCore.Identity;
 
 namespace SMS.Application.Services.Account
 {

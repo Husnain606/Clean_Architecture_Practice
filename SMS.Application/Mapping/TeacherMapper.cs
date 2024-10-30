@@ -8,12 +8,17 @@ namespace SMS.Application.Mapping
     {
         public TeacherMapper()
         {
-            CreateMap<CreateTeacherDto,Teacher>().ReverseMap();
-            CreateMap<TeacherDto, Teacher>().ReverseMap().ForMember(d => d.Name, s => s.MapFrom(std => std.TeacherFirstName + " " + std.TeacherLastName))
-                .ForMember(d => d.timespann, s => s.MapFrom(std => (DateTime.Now - std.HiringDate)))
-                .AddTransform<String>(n => string.IsNullOrEmpty(n) ? "Class not Found" : n);
-            //   .ForMember(d => d.StudentLastName, s => s.Ignore())
-            // Use CreateMap... Etc.. here (Profile methods are the same as configuration methods)
+            // Mapping from CreateTeacherDto to Teacher and vice versa
+            CreateMap<CreateTeacherDto, Teacher>()
+                .ForMember(dest => dest.HiringDate, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ReverseMap();
+
+            // Mapping from Teacher to TeacherDto and vice versa
+            CreateMap<Teacher, TeacherDto>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.TeacherFirstName} {src.TeacherLastName}"))
+                .ForMember(dest => dest.timespann, opt => opt.MapFrom(src => (DateTime.Now - src.HiringDate)))
+                .AddTransform<string>(n => string.IsNullOrEmpty(n) ? "Class not Found" : n)
+                .ReverseMap();
         }
     }
 }

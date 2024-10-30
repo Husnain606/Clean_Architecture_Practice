@@ -3,11 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using SMS.Application.Interfaces;
 using SMS.Application.Interfaces.Excel;
-using SMS.Application.Services.Students.Dto;
 using SMS.Common.ViewModels;
 using SMS.Domain.Entities;
-using System;
-using System.Drawing.Printing;
 
 namespace SMS.Application.Services.Excel
 {

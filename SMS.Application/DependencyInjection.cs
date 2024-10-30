@@ -17,8 +17,6 @@ using SMS.Application.Interfaces.Accounts;
 using SMS.Application.Services.Account;
 using AutoMapper;
 using SMS.Application.Interfaces.Identity;
-using SMS.Application.Services.UserConfigurations.Dto;
-using SMS.Application.Services.UserConfigurations;
 using SMS.Application.Services.Account.Dto;
 using SMS.Application.Services.Account.Validator;
 using SMS.Application.Modules;
@@ -55,8 +53,7 @@ namespace SMS.Application
 
         private static void AddValidations(this IServiceCollection services)
         {
-            services.AddTransient<IValidator<UpdateUserConfigurationDto>, UpdateUserConfigurationDtoValidator>();
-            //egister FluentValidation (Uncomment and add actual validators)
+          //egister FluentValidation (Uncomment and add actual validators)
             services.AddTransient<IValidator<CreateStudentDto>, StudentValidator>();
             services.AddTransient<IValidator<CreateDepartmentDto>, DepartmentValidator>();
             services.AddTransient<IValidator<CreateTeacherDto>, TeacherValidator>();
@@ -66,8 +63,10 @@ namespace SMS.Application
 
         private static IServiceCollection ResolveServices(this IServiceCollection services)
         {
-            services.AddScoped<IUserConfigurationService, UserConfigurationService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IRoleService,RoleService>();
+            services.AddScoped<IUserRoleService, UserRoleService>();
+            services.AddScoped<IUserClaimService, UserClaimService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<ITeacherService, TeacherService>();

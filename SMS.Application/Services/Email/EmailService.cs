@@ -7,9 +7,6 @@ using Microsoft.Extensions.Configuration;
 using SMS.Application.Interfaces.Email;
 using SMS.Application.Interfaces.Identity;
 using SMS.Common.ViewModels;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MailKit;
 
 namespace SMS.Application.Services.Email
@@ -164,65 +161,81 @@ namespace SMS.Application.Services.Email
         {
             var emailList = new List<EmailResponseModel>();
             using (var client = new ImapClient())
-            {
-                var imapServer = _config["EmailSettings:ImapServer"];
-                var imapPort = int.Parse(_config["EmailSettings:ImapPort"]);
-                var email = _config["EmailSettings:Email"];
-                var password = _config["EmailSettings:Password"];
+			{
+				await CreatingConection(client);
 
-                await client.ConnectAsync(imapServer, imapPort, true);
-                await client.AuthenticateAsync(email, password);
+				var folder = client.GetFolder(folderName);
+				await folder.OpenAsync(FolderAccess.ReadOnly);
+				var uids = await folder.SearchAsync(SearchQuery.All);
 
-                var folder = client.GetFolder(folderName);
-                await folder.OpenAsync(FolderAccess.ReadOnly);
-                var uids = await folder.SearchAsync(SearchQuery.All);
+				int count = 0;
+				foreach (var uid in uids)
+				{
+					var message = await folder.GetMessageAsync(uid);
 
-                int count = 0;
-                foreach (var uid in uids)
-                {
-                    var message = await folder.GetMessageAsync(uid);
+					// Check if the body is of type TextPart to get the encoding
+					string body, encodingName;
+					CheckBodyOfTypeText(message, out body, out encodingName);
 
-                    // Check if the body is of type TextPart to get the encoding
-                    string body = null;
-                    string encodingName = "Unknown";
+					// Map MimeMessage to EmailResponseModel
+					EmailResponseModel emailResponse = CreateEmailResponse(message, body, encodingName);
 
-                    if (message.Body is TextPart textPart)
-                    {
-                         body = textPart.Text;
-                        encodingName = textPart.ContentType.Charset ?? "Unknown"; // Get encoding if available
-                    }
-                    else if (message.Body is Multipart multipart) // Handle multipart messages (e.g., HTML + plain text)
-                    {
-                        foreach (var part in multipart)
-                        {
-                            if (part is TextPart partText)
-                            {
-                                 body = partText.Text;
-                                encodingName = partText.ContentType.Charset ?? "Unknown";
-                                break; // Prefer the first text part
-                            }
-                        }
-                    }
+					emailList.Add(emailResponse);
+					count++;
+					if (count == 4) break; // Limit to the first 4 emails
+				}
 
-                    // Map MimeMessage to EmailResponseModel
-                    var emailResponse = new EmailResponseModel
-                    {
-                        Sender = message.From.Mailboxes.FirstOrDefault()?.Address ?? "Unknown",
-                        Recipient = message.To.Mailboxes.FirstOrDefault()?.Address ?? "Unknown",
-                        Subject = message.Subject,
-                        Body = body ?? "No body", // Handle null body
-                        EncodingName = encodingName
-                    };
+				await client.DisconnectAsync(true);
+			}
 
-                    emailList.Add(emailResponse);
-                    count++;
-                    if (count == 4) break; // Limit to the first 4 emails
-                }
-
-                await client.DisconnectAsync(true);
-            }
-
-            return emailList;
+			return emailList;
         }
-    }
+
+		private static void CheckBodyOfTypeText(MimeMessage message, out string body, out string encodingName)
+		{
+			body = null;
+			encodingName = "Unknown";
+			if (message.Body is TextPart textPart)
+			{
+				body = textPart.Text;
+				encodingName = textPart.ContentType.Charset ?? "Unknown"; // Get encoding if available
+			}
+			else if (message.Body is Multipart multipart) // Handle multipart messages (e.g., HTML + plain text)
+			{
+				foreach (var part in multipart)
+				{
+					if (part is TextPart partText)
+					{
+						body = partText.Text;
+						encodingName = partText.ContentType.Charset ?? "Unknown";
+						break; // Prefer the first text part
+					}
+				}
+			}
+		}
+
+		private static EmailResponseModel CreateEmailResponse(MimeMessage message, string body, string encodingName)
+		{
+			var emailResponse = new EmailResponseModel
+			{
+				Sender = message.From.Mailboxes.FirstOrDefault()?.Address ?? "Unknown",
+				Recipient = message.To.Mailboxes.FirstOrDefault()?.Address ?? "Unknown",
+				Subject = message.Subject,
+				Body = body ?? "No body", // Handle null body
+				EncodingName = encodingName
+			};
+			return emailResponse;
+		}
+
+		private async Task CreatingConection(ImapClient client)
+		{
+			var imapServer = _config["EmailSettings:ImapServer"];
+			var imapPort = int.Parse(_config["EmailSettings:ImapPort"]);
+			var email = _config["EmailSettings:Email"];
+			var password = _config["EmailSettings:Password"];
+
+			await client.ConnectAsync(imapServer, imapPort, true);
+			await client.AuthenticateAsync(email, password);
+		}
+	}
 }

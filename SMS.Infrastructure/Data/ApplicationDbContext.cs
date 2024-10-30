@@ -1,52 +1,58 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using SMS.Domain.Entities;
 using SMS.Application.Interfaces;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using SMS.Presistence.Configuration;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using SMS.Persistence.Configuration;
+using SMS.Presistence.Configuration;
 
 namespace SMS.Infrastructure.Data
 {
-    public class ApplicationDbContext :IdentityDbContext<ApplicationUser> , IApplicationDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
-        //Entities
-        public DbSet<Department> Department { get; set; }
         public DbSet<Student> Student { get; set; }
         public DbSet<Teacher> Teacher { get; set; }
+        public DbSet<Department> Department { get; set; }
 
-        public ApplicationDbContext(DbContextOptions options)
-        : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
         {
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            //Entities
-            modelBuilder.ApplyConfiguration<ApplicationUser>(new ApplicationUserConfiguration());
-            modelBuilder.ApplyConfiguration<Student>(new StudentConfiguration());
-            modelBuilder.ApplyConfiguration<Department>(new DepartmentConfiguration());
-            modelBuilder.ApplyConfiguration<Teacher>(new TeacherConfiguration());
-            base.OnModelCreating(modelBuilder);
+            // Configure Student Entity
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.ApplicationUser)
+                .WithOne()
+                .HasForeignKey<Student>(s => s.UserId);
 
-            // Seed default Roles
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.Department)
+                .WithMany(d => d.Student)
+                .HasForeignKey(s => s.DepartmentId);
+
+            // Configure Teacher Entity
+            modelBuilder.Entity<Teacher>()
+                .HasOne(t => t.ApplicationUser)
+                .WithOne()
+                .HasForeignKey<Teacher>(t => t.UserId);
+
+            // Apply entity configurations
+            modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
+            modelBuilder.ApplyConfiguration(new StudentConfiguration());
+            modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
+            modelBuilder.ApplyConfiguration(new TeacherConfiguration());
+
+            // Seed default roles
             modelBuilder.Entity<IdentityRole>().HasData(
-                new IdentityRole
-                {
-                    Id = "1",
-                    Name = "Administration",
-                    NormalizedName = "ADMINISTRATION"
-                },
-                new IdentityRole
-                {
-                    Id = "2",
-                    Name = "User",
-                    NormalizedName = "USER"
-                }
+                new IdentityRole { Id = "1", Name = "Student", NormalizedName = "STUDENT" },
+                new IdentityRole { Id = "2", Name = "Teacher", NormalizedName = "TEACHER" }
             );
 
-            // Seed default ApplicationUsers
+            // Seed default ApplicationUser (Admin user)
             var adminUser = new ApplicationUser
             {
                 Id = "1",
@@ -54,9 +60,12 @@ namespace SMS.Infrastructure.Data
                 NormalizedUserName = "HUSNAINAHMED",
                 Email = "hasnain606@gmail.com",
                 NormalizedEmail = "HASNAIN606@GMAIL.COM",
-                EmailConfirmed = true,
-                PasswordHash = new PasswordHasher<ApplicationUser>().HashPassword(null, "NANI@606")
+                EmailConfirmed = true
             };
+
+            // Hash the password
+            var hasher = new PasswordHasher<ApplicationUser>();
+            adminUser.PasswordHash = hasher.HashPassword(adminUser, "NANI@606");
 
             modelBuilder.Entity<ApplicationUser>().HasData(adminUser);
 
@@ -64,15 +73,13 @@ namespace SMS.Infrastructure.Data
             modelBuilder.Entity<IdentityUserRole<string>>().HasData(
                 new IdentityUserRole<string>
                 {
-                    UserId = "1",
-                    RoleId = "1" // Admin role Id
+                    UserId = "1", // Admin user Id
+                    RoleId = "1"  // Admin role Id
                 }
             );
         }
 
-        // Use the new keyword to hide the base class member intentionally
-       public new DatabaseFacade Database => base.Database;
-     
-
+        // Expose the Database object for migrations
+        public new DatabaseFacade Database => base.Database;
     }
 }

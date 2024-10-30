@@ -5,7 +5,6 @@ using SMS.Application.Interfaces;
 using SMS.Application.Services.Students.Dto;
 using SMS.Common.ViewModels;
 using SMS.Common.Constants;
-using SMS.Common.Utilities;
 using SMS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using SMS.Application.Services.Students.Validators;
@@ -13,22 +12,30 @@ using SMS.Application.Services.Common;
 using System.Linq.Dynamic.Core;
 using SMS.Common.Extensions;
 using AutoMapper.QueryableExtensions;
+using SMS.Application.Services.Account.Dto;
+using SMS.Application.Interfaces.Identity;
 
 namespace SMS.Application.Services.Students
 {
     public class StudentService : IStudentService
     {
         private readonly IRepository<Student> _studentRepository;
+        private readonly IIdentityService _identityService;
         private readonly IMapper _mapper;
         private readonly ILogger<StudentService> _logger;
         private readonly IApplicationDbContext _dbContext;
-       
-        public StudentService(IRepository<Student> studentRepository, IMapper mapper, ILogger<StudentService> logger, IApplicationDbContext dbContext)
+
+        public StudentService(IRepository<Student> studentRepository,
+            IMapper mapper,
+            ILogger<StudentService> logger,
+            IApplicationDbContext dbContext,
+            IIdentityService identityService)
         {
             _studentRepository = studentRepository;
             _mapper = mapper;
             _logger = logger;
             _dbContext = dbContext;
+            _identityService = identityService;
         }
 
         // CREATE STUDENT
@@ -49,11 +56,34 @@ namespace SMS.Application.Services.Students
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
+                // Create a new ApplicationUser 
+                var applicationUser = new ApplicationUser
+                {
+                    UserName = studentModel.Mail, // Assuming the email is used as the username
+                    Email = studentModel.Mail,
+                    CreatedAt = DateTime.Now,
+                };
+
+                // Create the user in the database
+                CreateUserDto user = new CreateUserDto();
+                var result = await _identityService.CreateUserAsync(applicationUser, studentModel.Pasword);
+                if (!result.Succeeded)
+                {
+                    model.IsSuccess = false;
+                    model.Messsage = string.Join("; ", result.Errors.Select(e => e.Description));
+                    return model;
+                }
+
+                // Map the student model to the Student entity
                 var student = _mapper.Map<Student>(studentModel);
                 student.Id = Guid.NewGuid();
-                model = await _studentRepository.CreateAsync(student);
+                student.UserId = applicationUser.Id; // Associate the student with the created user
+
+                // Create the student in the database
+                var data = await _studentRepository.CreateAsync(student);
                 await transaction.CommitAsync();
 
+                model.data = data;
                 model.IsSuccess = true;
                 model.Messsage = StudentConstants.successMessage;
             }
@@ -61,7 +91,8 @@ namespace SMS.Application.Services.Students
             {
                 await transaction.RollbackAsync();
                 _logger.LogError(ex, "Error occurred while creating student.");
-                throw ex;
+                model.IsSuccess = false;
+                model.Messsage = "An error occurred while creating the student.";
             }
 
             return model;

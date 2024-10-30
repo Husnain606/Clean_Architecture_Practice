@@ -9,8 +9,8 @@ namespace SMS.Application.Interfaces
         DbSet<Department> Department { get; set; }
         DbSet<Student> Student { get; set; }
         DbSet<Teacher> Teacher { get; set; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         DatabaseFacade Database { get; }
     }
 }
-    

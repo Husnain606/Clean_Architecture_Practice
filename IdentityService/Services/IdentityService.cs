@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using SMS.Application.Interfaces.Identity;
 using SMS.Domain.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SMS.IdentityService.Services
 {

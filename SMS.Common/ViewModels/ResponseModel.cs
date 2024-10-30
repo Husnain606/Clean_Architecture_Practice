@@ -14,5 +14,6 @@ namespace SMS.Common.ViewModels
         public dynamic data { get; set; }
         public HttpStatusCode StatusCode { get; set; }
         public IEnumerable<string>? Errors { get; set; }
+        public string Message { get; set; }
     }
 }

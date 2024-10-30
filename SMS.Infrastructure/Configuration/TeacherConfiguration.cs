@@ -36,13 +36,13 @@ namespace SMS.Presistence.Configuration
             builder.HasIndex(t => t.Mail)
                 .IsUnique();
 
-            builder.Property(t => t.Pasword)
-                .IsRequired()
-                .HasMaxLength(100);
+            //builder.Property(t => t.Pasword)
+            //    .IsRequired()
+            //    .HasMaxLength(100);
 
-            builder.Property(t => t.ConfirmPasword)
-                .IsRequired()
-                .HasMaxLength(100);
+            //builder.Property(t => t.ConfirmPasword)
+            //    .IsRequired()
+            //    .HasMaxLength(100);
 
             builder.Property(t => t.SchoolId)
                 .IsRequired();

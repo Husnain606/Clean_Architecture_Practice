@@ -11,9 +11,9 @@ namespace SMS.Application.Interfaces.Students
         Task<ResponseModel> CreateStudentAsync(CreateStudentDto StudentModel);
         Task<ResponseModel> DeleteStudentAsync(Guid StudentID);
         Task<List<StudentRequestDto>> GetStudentDetailsByAgeG13Async(int age);    // 2.	O  - Open Closed Principal (OCP):
-                                                                           // it is open for extension that it can get the student
-                                                                           // by some parameter chechk  now it is depend upon service
-                                                                           // that in parameter through which filter it can process
+                                                                                  // it is open for extension that it can get the student
+                                                                                  // by some parameter chechk  now it is depend upon service
+                                                                                  // that in parameter through which filter it can process
 
     }
 }

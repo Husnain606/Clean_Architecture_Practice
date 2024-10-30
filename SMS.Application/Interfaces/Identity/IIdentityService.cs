@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SMS.Domain.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SMS.Application.Interfaces.Identity
 {

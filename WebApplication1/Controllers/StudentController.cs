@@ -27,7 +27,7 @@ namespace WebApplication1.Controllers
         }
         [AllowAnonymous]
         // GET ALL STUDENT
-        [HttpGet("GetAllStudents")]
+        [HttpGet("GetAll")]
         public async Task<ActionResult<ResponseModel<GridDto<StudentDto>>>> GetAllStudents([FromQuery] StudentRequestDto request)
         {
             try

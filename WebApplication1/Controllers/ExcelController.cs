@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SMS.Application.Interfaces.Excel;
-using SMS.Application.Services.Students.Dto;
-using SMS.Application.Services;
-using SMS.Domain.Entities;
-using System.Drawing.Printing;
 
 namespace WebApplication1.Controllers
 {

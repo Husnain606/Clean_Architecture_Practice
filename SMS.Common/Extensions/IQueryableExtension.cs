@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Dynamic.Core;
+﻿using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 
 namespace SMS.Common.Extensions

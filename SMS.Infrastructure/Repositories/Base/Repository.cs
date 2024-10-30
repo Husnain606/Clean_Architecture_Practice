@@ -13,7 +13,6 @@ namespace SMS.Infrastructure.Repositories.Base
         {
             _dbContext = dbContext;
         }
-
         // IQueryable<T> implementation
         protected virtual DbSet<T> Entities => _entities ??= _dbContext.Set<T>();
 
@@ -29,6 +28,7 @@ namespace SMS.Infrastructure.Repositories.Base
             {
                 await _dbContext.AddAsync<T>(createModel);
                 await _dbContext.SaveChangesAsync();
+                model.data = createModel;
                 model.IsSuccess = true;
                 model.Messsage = "Entity Created Successfully";
             }

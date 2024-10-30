@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SMS.Application.Interfaces.Email;
-using SMS.Common.ViewModels;
 
 namespace WebApplication1.Controllers
 {

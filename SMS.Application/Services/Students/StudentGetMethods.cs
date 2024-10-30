@@ -223,7 +223,7 @@ namespace SMS.Application.Services.Students
                         Students = group.Select(student => new StudentRequestDto
                         {
                             Name = student.StudentFirstName + " " + student.StudentLastName,
-                            Mail = student.Mail,
+                           // Mail = student.Mail,
                             Class = student.Class,
                             Contact = student.Contact,
                             Age = student.Age

@@ -94,7 +94,7 @@ namespace SMS.Application.Services.Teachers
                     return null;
                 }
                 var teacherDTO = _mapper.Map<TeacherDto>(teacher);
-                teacherDTO.timespann= CheckTime.GetTimeDifference(teacher.HiringDate);
+                teacherDTO.timespann = CheckTime.GetTimeDifference(teacher.HiringDate);
                 return teacherDTO;
             }
             catch (Exception ex)

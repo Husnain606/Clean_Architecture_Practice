@@ -39,16 +39,16 @@ namespace SMS.Presistence.Configuration
             builder.HasIndex(s => s.Mail)
                 .IsUnique();
 
-            builder.Property(s => s.Pasword)
-                .IsRequired()
-                .HasMaxLength(100); // Assuming maximum password length is 100 characters
+            //builder.Property(s => s.Pasword)
+            //    .IsRequired()
+            //    .HasMaxLength(100); // Assuming maximum password length is 100 characters
 
-            builder.HasIndex(s => s.Pasword)
-                .IsUnique();
+            //builder.HasIndex(s => s.Pasword)
+            //    .IsUnique();
 
-            builder.Property(s => s.ConfirmPasword)
-                .IsRequired()
-                .HasMaxLength(100);
+            //builder.Property(s => s.ConfirmPasword)
+            //    .IsRequired()
+            //    .HasMaxLength(100);
 
             builder.Property(s => s.DepartmentId)
                 .IsRequired();

@@ -12,7 +12,6 @@
         public string Mail { get; set; } = string.Empty;
         public string Pasword { get; set; } = string.Empty;
         public string ConfirmPasword { get; set; } = string.Empty;
-        public DateTime HiringDate { get; set; } = DateTime.Now;
         public Guid SchoolId { get; set; }
         public Guid BranchId { get; set; }
     }

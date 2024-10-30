@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SMS.Application.Services.Common
+﻿namespace SMS.Application.Services.Common
 {
     public class GridDto<T> where T : class
     {

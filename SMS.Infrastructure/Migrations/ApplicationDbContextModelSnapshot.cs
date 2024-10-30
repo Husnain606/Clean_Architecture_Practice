@@ -52,14 +52,14 @@ namespace SMS.Presistence.Migrations
                         new
                         {
                             Id = "1",
-                            Name = "Administration",
-                            NormalizedName = "ADMINISTRATION"
+                            Name = "Student",
+                            NormalizedName = "STUDENT"
                         },
                         new
                         {
                             Id = "2",
-                            Name = "User",
-                            NormalizedName = "USER"
+                            Name = "Teacher",
+                            NormalizedName = "TEACHER"
                         });
                 });
 
@@ -239,6 +239,12 @@ namespace SMS.Presistence.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("TeacherId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -257,6 +263,10 @@ namespace SMS.Presistence.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("TeacherId");
+
                     b.ToTable("AspNetUsers", (string)null);
 
                     b.HasData(
@@ -264,7 +274,7 @@ namespace SMS.Presistence.Migrations
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "95d308d0-845d-4c71-99a3-efee4f555b29",
+                            ConcurrencyStamp = "302af87b-4d07-4de5-b207-1beed39e5f91",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "hasnain606@gmail.com",
                             EmailConfirmed = true,
@@ -272,9 +282,9 @@ namespace SMS.Presistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "HASNAIN606@GMAIL.COM",
                             NormalizedUserName = "HUSNAINAHMED",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPvC8U+q2nRlerY9bcBPyUmrEuUtMCsLeLZ8YHkg/TDQh3g5N2UB0DEKSjvMSMuBRw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEP3rmtkrGrl3J15x1CSQQMb2aPqMfz78Uzo09QoVvjZKYeNh7dbWsd4SC0iEYAbN7g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "72c7c565-42b4-4525-89aa-4ce331081d56",
+                            SecurityStamp = "4db94f94-32cf-4374-b405-33eecd051447",
                             TwoFactorEnabled = false,
                             UserName = "HusnainAhmed"
                         });
@@ -313,11 +323,6 @@ namespace SMS.Presistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ConfirmPasword")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("Contact")
                         .IsRequired()
                         .HasMaxLength(11)
@@ -330,11 +335,6 @@ namespace SMS.Presistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Mail")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Pasword")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -354,6 +354,10 @@ namespace SMS.Presistence.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
@@ -361,7 +365,7 @@ namespace SMS.Presistence.Migrations
                     b.HasIndex("Mail")
                         .IsUnique();
 
-                    b.HasIndex("Pasword")
+                    b.HasIndex("UserId")
                         .IsUnique();
 
                     b.ToTable("Student");
@@ -384,11 +388,6 @@ namespace SMS.Presistence.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
 
-                    b.Property<string>("ConfirmPasword")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("Contact")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -397,11 +396,6 @@ namespace SMS.Presistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Mail")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Pasword")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -424,9 +418,16 @@ namespace SMS.Presistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Mail")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
                         .IsUnique();
 
                     b.ToTable("Teacher");
@@ -483,6 +484,21 @@ namespace SMS.Presistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SMS.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("SMS.Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
+
+                    b.HasOne("SMS.Domain.Entities.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId");
+
+                    b.Navigation("Student");
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("SMS.Domain.Entities.Student", b =>
                 {
                     b.HasOne("SMS.Domain.Entities.Department", "Department")
@@ -491,7 +507,26 @@ namespace SMS.Presistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SMS.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne()
+                        .HasForeignKey("SMS.Domain.Entities.Student", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("SMS.Domain.Entities.Teacher", b =>
+                {
+                    b.HasOne("SMS.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithOne()
+                        .HasForeignKey("SMS.Domain.Entities.Teacher", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("SMS.Domain.Entities.Department", b =>

@@ -1,5 +1,4 @@
-﻿using MimeKit;
-using SMS.Common.ViewModels;
+﻿using SMS.Common.ViewModels;
 
 namespace SMS.Application.Interfaces.Email
 {
