@@ -47,21 +47,21 @@ namespace SMS.Application.Services.Email
                 try
                 {
                     await smtpClient.SendMailAsync(mailMessage);
-                    model.IsSuccess = true;
+                    model.Successful = true;
                     model.StatusCode = HttpStatusCode.OK;
-                    model.Messsage = "Email sent successfully.";
+                    model.Message = "Email sent successfully.";
                 }
                 catch (SmtpException smtpEx)
                 {
-                    model.IsSuccess = false;
+                    model.Successful = false;
                     model.StatusCode = HttpStatusCode.InternalServerError;
-                    model.Messsage = $"SMTP error: {smtpEx.Message}";
+                    model.Message = $"SMTP error: {smtpEx.Message}";
                 }
                 catch (Exception ex)
                 {
-                    model.IsSuccess = false;
+                    model.Successful = false;
                     model.StatusCode = HttpStatusCode.InternalServerError;
-                    model.Messsage = $"Error sending email: {ex.Message}";
+                    model.Message = $"Error sending email: {ex.Message}";
                 }
                 return model;
             }
@@ -76,22 +76,22 @@ namespace SMS.Application.Services.Email
                 if (user != null)
                 {
                     var emailResult = await SendEmailAsync(user.Email, subject, body);
-                    model.IsSuccess = emailResult.IsSuccess;
-                    model.Messsage = emailResult.Messsage;
+                    model.Successful = emailResult.Successful;
+                    model.Message = emailResult.Message;
                     model.StatusCode = emailResult.StatusCode;
                 }
                 else
                 {
-                    model.IsSuccess = false;
+                    model.Successful = false;
                     model.StatusCode = HttpStatusCode.NotFound;
-                    model.Messsage = "User not found.";
+                    model.Message = "User not found.";
                 }
             }
             catch (Exception ex)
             {
-                model.IsSuccess = false;
+                model.Successful = false;
                 model.StatusCode = HttpStatusCode.InternalServerError;
-                model.Messsage = $"Error retrieving user: {ex.Message}";
+                model.Message = $"Error retrieving user: {ex.Message}";
             }
 
             return model;
@@ -110,33 +110,33 @@ namespace SMS.Application.Services.Email
                         try
                         {
                             var emailResult = await SendEmailAsync(user.Email, subject, body);
-                            if (!emailResult.IsSuccess)
+                            if (!emailResult.Successful)
                             {
-                                model.Messsage += $"Failed to send email to {user.Email}: {emailResult.Messsage}\n";
+                                model.Message += $"Failed to send email to {user.Email}: {emailResult.Message}\n";
                             }
                         }
                         catch (Exception emailEx)
                         {
-                            model.Messsage += $"Error sending email to {user.Email}: {emailEx.Message}\n";
+                            model.Message += $"Error sending email to {user.Email}: {emailEx.Message}\n";
                         }
                     }
 
-                    model.IsSuccess = true;
+                    model.Successful = true;
                     model.StatusCode = HttpStatusCode.OK;
-                    model.Messsage += "Emails sent to all users.";
+                    model.Message += "Emails sent to all users.";
                 }
                 else
                 {
-                    model.IsSuccess = false;
+                    model.Successful = false;
                     model.StatusCode = HttpStatusCode.NotFound;
-                    model.Messsage = "No users found.";
+                    model.Message = "No users found.";
                 }
             }
             catch (Exception ex)
             {
-                model.IsSuccess = false;
+                model.Successful = false;
                 model.StatusCode = HttpStatusCode.InternalServerError;
-                model.Messsage = $"Error retrieving users: {ex.Message}";
+                model.Message = $"Error retrieving users: {ex.Message}";
             }
 
             return model;

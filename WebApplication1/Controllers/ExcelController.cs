@@ -21,14 +21,14 @@ namespace WebApplication1.Controllers
                 return BadRequest("No file provided.");
 
             var entities = await _excelService.ReadExcelFileAsync(file,1,2,true);
-            return Ok(entities); // Return the saved data for verification
+            return Ok(entities); // Return the saved Result for verification
         }
 
         [HttpGet("get")]
         public async Task<IActionResult> GetExcelData()
         {
             var entities = await _excelService.GetAllExcelDataAsync(1,2);
-            return Ok(entities); // This will return the data to be viewed in Swagger
+            return Ok(entities); // This will return the Result to be viewed in Swagger
         }
 
         [HttpPost("getAll")]
@@ -40,7 +40,7 @@ namespace WebApplication1.Controllers
             if (entities == null || file.Length == 0)
                 return BadRequest("No file provided.");
 
-            return Ok(entities); // Return the saved data for verification
+            return Ok(entities); // Return the saved Result for verification
         }
     }
 }

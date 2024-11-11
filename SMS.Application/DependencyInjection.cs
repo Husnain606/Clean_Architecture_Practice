@@ -53,7 +53,6 @@ namespace SMS.Application
 
         private static void AddValidations(this IServiceCollection services)
         {
-          //egister FluentValidation (Uncomment and add actual validators)
             services.AddTransient<IValidator<CreateStudentDto>, StudentValidator>();
             services.AddTransient<IValidator<CreateDepartmentDto>, DepartmentValidator>();
             services.AddTransient<IValidator<CreateTeacherDto>, TeacherValidator>();
@@ -67,6 +66,7 @@ namespace SMS.Application
             services.AddScoped<IRoleService,RoleService>();
             services.AddScoped<IUserRoleService, UserRoleService>();
             services.AddScoped<IUserClaimService, UserClaimService>();
+            services.AddScoped<IRoleClaimService, RoleClaimService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<ITeacherService, TeacherService>();
@@ -77,3 +77,4 @@ namespace SMS.Application
 
     }
 }
+       

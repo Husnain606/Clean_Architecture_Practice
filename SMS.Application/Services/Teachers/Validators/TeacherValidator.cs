@@ -7,15 +7,15 @@ namespace SMS.Application.Services.Teachers.Validators
     {
         public TeacherValidator()
         {
-            RuleFor(t => t.TeacherFirstName)
+            RuleFor(t => t.FirstName)
                 .NotEmpty().WithMessage("First Name is required")
                 .MaximumLength(50).WithMessage("First Name cannot exceed 50 characters");
 
-            RuleFor(t => t.TeacherLastName)
+            RuleFor(t => t.LastName)
                 .NotEmpty().WithMessage("Last Name is required")
                 .MaximumLength(50).WithMessage("Last Name cannot exceed 50 characters");
 
-            RuleFor(t => t.TeacherFatherName)
+            RuleFor(t => t.FatherName)
                 .NotEmpty().WithMessage("Father Name is required")
                 .MaximumLength(50).WithMessage("Father Name cannot exceed 50 characters");
 

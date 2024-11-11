@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using IdentityService.Models;
 using SMS.Common.Responses;
+using SMS.Common.ViewModels;
 
 namespace SMS.IdentityService.Services
 {
@@ -16,14 +17,18 @@ namespace SMS.IdentityService.Services
     {
         private readonly JwtSettings _jwtSettings;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUserRoleService _userRole;
 
-        public TokenService(IOptions<JwtSettings> jwtSettings, UserManager<ApplicationUser> userManager)
+        public TokenService(IOptions<JwtSettings> jwtSettings,
+            UserManager<ApplicationUser> userManager,
+            IUserRoleService userRole)
         {
             _jwtSettings = jwtSettings.Value;
             _userManager = userManager;
+            _userRole = userRole;
         }
 
-        public async Task<Response<AuthenticationResponse>> GenerateUserTokenAsync(ApplicationUser user)
+        public async Task<ResponseModel<AuthenticationResponse>> GenerateUserTokenAsync(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
@@ -31,7 +36,7 @@ namespace SMS.IdentityService.Services
             {
                 new Claim(JwtRegisteredClaimNames.Name, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -46,7 +51,7 @@ namespace SMS.IdentityService.Services
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return new Response<AuthenticationResponse>
+            return new ResponseModel<AuthenticationResponse>
             {
                 Successful = true,
                 Message = IdentityMessageConstants.UserAuthenticatedSuccessfully,

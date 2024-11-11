@@ -8,6 +8,7 @@ using SMS.Application.Interfaces.Identity;
 using FluentValidation;
 using AutoMapper;
 using SMS.Application.Interfaces;
+using SMS.Common.ViewModels;
 
 namespace SMS.Application.Services.Account
 {
@@ -30,7 +31,7 @@ namespace SMS.Application.Services.Account
             _dbContext = dbContext;
         }
 
-        public async Task<Response> ChangePasswordAsync(ChangePasswordDto model)
+        public async Task<ResponseModel> ChangePasswordAsync(ChangePasswordDto model)
         {
             try
             {
@@ -57,7 +58,7 @@ namespace SMS.Application.Services.Account
                     throw new ValidationException(IdentityMessageConstants.UnableToChangePassword);
                 }
 
-                return new Response
+                return new ResponseModel
                 {
                     Successful = true,
                     Message = IdentityMessageConstants.PasswordChangedSuccessfully
@@ -70,7 +71,7 @@ namespace SMS.Application.Services.Account
             }
         }
 
-        public async Task<Response<AuthenticationResponse>> CreateUserAsync(CreateUserDto model)
+        public async Task<ResponseModel<AuthenticationResponse>> CreateUserAsync(CreateUserDto model)
         {
             try
             {
@@ -95,7 +96,7 @@ namespace SMS.Application.Services.Account
             }
         }
 
-        public async Task<Response<AuthenticationResponse>> LoginUserAsync(LoginDto model)
+        public async Task<ResponseModel<AuthenticationResponse>> LoginUserAsync(LoginDto model)
         {
             try
             {
@@ -119,7 +120,7 @@ namespace SMS.Application.Services.Account
             }
         }
 
-        public async Task<Response<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenDto refreshToken)
+        public async Task<ResponseModel<AuthenticationResponse>> RefreshTokenAsync(RefreshTokenDto refreshToken)
         {
             try
             {
@@ -138,5 +139,7 @@ namespace SMS.Application.Services.Account
                 throw; // Optionally rethrow or handle the error
             }
         }
+
+      
     }
 }

@@ -9,15 +9,13 @@ namespace SMS.Application.Mapping
         public StudentMapper()
         {
             CreateMap<CreateStudentDto, Student>()
-                .ForMember(d => d.StudentFirstName, opt => opt.MapFrom(s => s.StudentFirstName))
-                .ForMember(d => d.StudentLastName, opt => opt.MapFrom(s => s.StudentLastName))
                 .ReverseMap();
 
             CreateMap<StudentDto, Student>().ReverseMap()
-                .ForMember(d => d.Name, s => s.MapFrom(std => std.StudentFirstName + " " + std.StudentLastName));
+                .ForMember(d => d.Name, s => s.MapFrom(std => std.FirstName + " " + std.LastName));
 
             CreateMap<StudentRequestDto, Student>().ReverseMap()
-                .ForMember(d => d.Name, s => s.MapFrom(std => std.StudentFirstName + " " + std.StudentLastName))
+                .ForMember(d => d.Name, s => s.MapFrom(std => std.FirstName + " " + std.LastName))
                 .ForMember(d => d.timespann, s => s.MapFrom(std => (DateTime.Now - std.EnrollmentDate)))
                 .ForMember(n => n.Class, op => op.MapFrom(n => n.Class))
                 .AddTransform<string>(n => string.IsNullOrEmpty(n) ? "Class not Found" : n);

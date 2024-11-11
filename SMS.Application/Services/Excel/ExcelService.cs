@@ -5,6 +5,7 @@ using SMS.Application.Interfaces;
 using SMS.Application.Interfaces.Excel;
 using SMS.Common.ViewModels;
 using SMS.Domain.Entities;
+using System.Linq.Dynamic.Core;
 
 namespace SMS.Application.Services.Excel
 {
@@ -21,7 +22,7 @@ namespace SMS.Application.Services.Excel
         {
             try
             {
-                ResponseModel model = new ResponseModel();
+                ResponseModel<PagedResult<Department>> model = new ResponseModel<PagedResult<Department>>();
                 List<Department> entities = new List<Department>();
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -45,8 +46,8 @@ namespace SMS.Application.Services.Excel
                     PageSize = pageSize
                 };
 
-                model.data = pagedResult;
-                model.IsSuccess = true;
+                model.Result = pagedResult;
+                model.Successful = true;
                 model.StatusCode = System.Net.HttpStatusCode.OK;
                 return model;
             }
@@ -106,7 +107,7 @@ namespace SMS.Application.Services.Excel
             catch (Exception ex)
             {
                 // Log the exception or handle it as necessary
-                throw new Exception("Error while saving Excel data to the database", ex);
+                throw new Exception("Error while saving Excel Result to the Resultbase", ex);
             }
         }
 
@@ -114,13 +115,13 @@ namespace SMS.Application.Services.Excel
         {
             try
             {
-                ResponseModel model = new ResponseModel();
+                ResponseModel<PagedResult<Department>> model = new ResponseModel<PagedResult<Department>>();
                 int totalRecords = await _context.Department.CountAsync();
               var deparment=  await _context.Department
                     .OrderBy(d => d.DepartmentName) // Apply sorting (optional)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
-                    .ToListAsync();    // Fetch the paginated records from the database
+                    .ToListAsync();    // Fetch the paginated records from the Resultbase
                 var pagedResult = new PagedResult<Department>
                 {
                     Items = deparment,
@@ -128,15 +129,15 @@ namespace SMS.Application.Services.Excel
                     PageNumber = pageNumber,
                     PageSize = pageSize
                 };
-                model.data = pagedResult;
-                model.IsSuccess = true;
+                model.Result = pagedResult;
+                model.Successful = true;
                 model.StatusCode = System.Net.HttpStatusCode.OK;
                  return model;
             }
             catch (Exception ex)
             {
                 // Log the exception or handle it as necessary
-                throw new Exception("Error while fetching all Excel data", ex);
+                throw new Exception("Error while fetching all Excel Result", ex);
             }
         }
     }

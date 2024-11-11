@@ -1,3 +1,4 @@
+using FluentValidation.AspNetCore;
 using IdentityService.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,7 @@ using System.Text;
 
 internal class Program
 {
+    [Obsolete]
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +36,11 @@ internal class Program
 
         // Add Application Services
         builder.Services.AddApplication(); // Ensure this extension method is defined
-        builder.Services.AddPlanningPortalPersistence(builder.Configuration);
+        builder.Services.AddSMSPersistence(builder.Configuration);
+
+        //Add Fluent Validation
+        builder.Services.AddControllers()
+            .AddFluentValidation(option => option.RegisterValidatorsFromAssemblyContaining<Program>());
 
         builder.Services.AddAuthorization();
         builder.Services.AddControllers();

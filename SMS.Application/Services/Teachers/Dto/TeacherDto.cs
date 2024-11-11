@@ -1,4 +1,6 @@
-﻿namespace SMS.Application.Services.Teachers.Dto
+﻿using SMS.Common.ViewModels;
+
+namespace SMS.Application.Services.Teachers.Dto
 {
     public class TeacherDto
     {
@@ -12,5 +14,10 @@
         public string School { get; set; } = string.Empty;
         public string Branch { get; set; } = string.Empty;
         public string timespann { get; set; }
+
+        public static implicit operator TeacherDto(ResponseModel v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

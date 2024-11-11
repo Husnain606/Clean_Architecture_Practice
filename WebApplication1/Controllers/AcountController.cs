@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using SMS.Application.Services.Account.Dto;
 using SMS.Application.Interfaces.Accounts;
 using SMS.Common.Responses;
+using SMS.Common.ViewModels;
 
 namespace WebApplication1.Controllers
 {
@@ -22,7 +23,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost(nameof(CreateUser))]
-        public async Task<ActionResult<Response<AuthenticationResponse>>> CreateUser([FromBody] CreateUserDto model)
+        public async Task<ActionResult<ResponseModel<AuthenticationResponse>>> CreateUser([FromBody] CreateUserDto model)
         {
             var result = await _accountService.CreateUserAsync(model);
             return Ok(result);
@@ -30,7 +31,7 @@ namespace WebApplication1.Controllers
 
         [AllowAnonymous]
         [HttpPost(nameof(Login))]
-        public async Task<ActionResult<Response<AuthenticationResponse>>> Login([FromBody] LoginDto model)
+        public async Task<ActionResult<ResponseModel<AuthenticationResponse>>> Login([FromBody] LoginDto model)
         {
             var result = await _accountService.LoginUserAsync(model);
             return Ok(result);
@@ -38,14 +39,14 @@ namespace WebApplication1.Controllers
 
         [AllowAnonymous]
         [HttpPost(nameof(RefreshToken))]
-        public async Task<ActionResult<Response<AuthenticationResponse>>> RefreshToken([FromBody] RefreshTokenDto refreshToken)
+        public async Task<ActionResult<ResponseModel<AuthenticationResponse>>> RefreshToken([FromBody] RefreshTokenDto refreshToken)
         {
             var result = await _accountService.RefreshTokenAsync(refreshToken);
             return Ok(result);
         }
 
         [HttpPost(nameof(ChangePassword))]
-        public async Task<ActionResult<Response>> ChangePassword([FromBody] ChangePasswordDto model)
+        public async Task<ActionResult<ResponseModel>> ChangePassword([FromBody] ChangePasswordDto model)
         {
             var result = await _accountService.ChangePasswordAsync(model);
             return Ok(result);

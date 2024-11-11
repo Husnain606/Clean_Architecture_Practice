@@ -29,21 +29,21 @@ namespace WebApplication1.Controllers
         public async Task<ActionResult<ResponseModel<IdentityRole>>> CreateRole([FromBody] CreateRoleDto roleDto)
         {
             var result = await _roleService.CreateRoleAsync(roleDto);
-            return Ok(new ResponseModel<IdentityRole> { data = result });
+            return Ok(new ResponseModel<IdentityRole> { Result = result });
         }
 
         [HttpGet("roles/{roleId}")]
         public async Task<ActionResult<ResponseModel<IdentityRole>>> GetRoleById(string roleId)
         {
             var result = await _roleService.GetRoleByIdAsync(roleId);
-            return Ok(new ResponseModel<IdentityRole> { data = result });
+            return Ok(new ResponseModel<IdentityRole> { Result = result });
         }
 
         [HttpGet("roles")]
         public async Task<ActionResult<ResponseModel<IEnumerable<IdentityRole>>>> GetAllRoles()
         {
             var result = await _roleService.GetAllRolesAsync();
-            return Ok(new ResponseModel<IEnumerable<IdentityRole>> { data = result });
+            return Ok(new ResponseModel<IEnumerable<IdentityRole>> { Result = result });
         }
 
         [HttpPut("roles/{roleId}")]
@@ -60,21 +60,7 @@ namespace WebApplication1.Controllers
             return Ok(new ResponseModel { Message = "Role deleted successfully." });
         }
 
-        // User Role Operations
-
-        [HttpPost("users/{userId}/roles/{roleId}")]
-        public async Task<ActionResult<ResponseModel>> AssignRole(string userId, string roleId)
-        {
-            await _userRoleService.AssignRoleAsync(userId, roleId);
-            return Ok(new ResponseModel { Message = "Role assigned successfully." });
-        }
-
-        [HttpDelete("users/{userId}/roles/{roleId}")]
-        public async Task<ActionResult<ResponseModel>> RemoveRole(string userId, string roleId)
-        {
-            await _userRoleService.RemoveRoleAsync(userId, roleId);
-            return Ok(new ResponseModel { Message = "Role removed successfully." });
-        }
+       
     }
 }
 

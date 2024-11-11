@@ -7,15 +7,15 @@ namespace SMS.Application.Services.Students.Validators
     {
         public StudentValidator()
         {
-            RuleFor(s => s.StudentFirstName)
+            RuleFor(s => s.FirstName)
                 .NotEmpty().WithMessage("First Name is required")
                 .MaximumLength(30);
 
-            RuleFor(s => s.StudentLastName)
+            RuleFor(s => s.LastName)
                 .NotEmpty()
                 .MaximumLength(30);
 
-            RuleFor(s => s.StudentFatherName)
+            RuleFor(s => s.FatherName)
                 .NotEmpty()
                 .MaximumLength(30);
 

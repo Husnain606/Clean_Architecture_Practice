@@ -6,6 +6,6 @@
         public const string MethodExecuted = "method executed";
         public const string EntryDeleted = "removed by";
         public const string EntryUpdated = "updated by";
-        public const string CannotGenerateDataTable = "Cannot generate data table";
+        public const string CannotGenerateDataTable = "Cannot generate Result table";
     }
 }

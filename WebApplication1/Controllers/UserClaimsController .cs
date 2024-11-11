@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SMS.Application.Interfaces.Identity;
-using SMS.Application.Services.Account;
+using SMS.Application.Services.Account.Dto;
 using System.Security.Claims;
 
 namespace WebApplication1.Controllers
@@ -19,9 +18,14 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost("{userId}/claims")]
-        public async Task<ActionResult> AddClaim(string userId, [FromBody] Claim claim)
+        public async Task<ActionResult> AddClaim(string userId, [FromBody] UserClaimDto claimDto)
         {
-            var result = await _userClaimService.AddClaimAsync(userId, claim);
+            if (claimDto == null)
+            {
+                return BadRequest("Claim Result is required.");
+            }
+
+            var result = await _userClaimService.AddClaimAsync(userId, claimDto);
             if (result.Succeeded)
             {
                 return Ok(new { Message = "Claim added successfully." });

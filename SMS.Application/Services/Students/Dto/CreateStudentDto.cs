@@ -3,11 +3,11 @@
     public class CreateStudentDto
     {
         public Guid Id { get; set; }
-        public string StudentFirstName { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
 
-        public string StudentLastName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
 
-        public string StudentFatherName { get; set; } = string.Empty;
+        public string FatherName { get; set; } = string.Empty;
 
         public int Age { get; set; }
 

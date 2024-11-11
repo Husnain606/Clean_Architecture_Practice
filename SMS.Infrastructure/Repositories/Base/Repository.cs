@@ -2,6 +2,7 @@
 using SMS.Infrastructure.Data;
 using SMS.Common.ViewModels;
 using SMS.Application.Interfaces;
+using System.Linq.Expressions;
 
 namespace SMS.Infrastructure.Repositories.Base
 {
@@ -23,20 +24,36 @@ namespace SMS.Infrastructure.Repositories.Base
         // CREATE 
         public async Task<ResponseModel> CreateAsync(T createModel)
         {
-            ResponseModel model = new ResponseModel();
+            ResponseModel<T> model = new ResponseModel<T>();
             try
             {
                 await _dbContext.AddAsync<T>(createModel);
                 await _dbContext.SaveChangesAsync();
-                model.data = createModel;
-                model.IsSuccess = true;
-                model.Messsage = "Entity Created Successfully";
+                model.Result = createModel;
+                model.Successful = true;
+                model.Message = "Entity Created Successfully";
             }
             catch (Exception)
             {
                 throw;
             }
             return model;
+        }
+
+        public async Task<bool> CreateAsync(IList<T> entities)
+        {
+            try
+            {
+                await Entities.AddRangeAsync(entities);
+                return await _dbContext.SaveChangesAsync() > 0;
+                
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+           
+            
         }
         // GET THE LIST OF ALL 
         public async Task<List<T>> GetAllAsync()
@@ -85,14 +102,27 @@ namespace SMS.Infrastructure.Repositories.Base
             {
                 _dbContext.Update<T>(updateModel);
                 await _dbContext.SaveChangesAsync();
-                model.IsSuccess = true;
-                model.Messsage = "Entity Updated Successfully";
+                model.Successful = true;
+                model.Message = "Entity Updated Successfully";
             }
             catch (Exception)
             {
                 throw;
             }
             return model;
+        }
+        public async Task<bool> UpdateAsync(IList<T> entities)
+        {
+            try
+            {
+                _dbContext.UpdateRange(entities);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+           
         }
         // DELETE 
         public async Task<ResponseModel> DeleteAsync(Guid id)
@@ -105,13 +135,13 @@ namespace SMS.Infrastructure.Repositories.Base
                 {
                     _dbContext.Remove<T>(entity);
                     await _dbContext.SaveChangesAsync();
-                    model.IsSuccess = true;
-                    model.Messsage = "Entity Deleted Successfully";
+                    model.Successful = true;
+                    model.Message = "Entity Deleted Successfully";
                 }
                 else
                 {
-                    model.IsSuccess = false;
-                    model.Messsage = "Entity Not Found";
+                    model.Successful = false;
+                    model.Message = "Entity Not Found";
                 }
             }
             catch (Exception)
@@ -119,6 +149,30 @@ namespace SMS.Infrastructure.Repositories.Base
                 throw;
             }
             return model;
+        }
+        public async Task<bool> DeleteAsync(Expression<Func<T, bool>> predicate)
+        {
+            try 
+            {
+                return await Entities.Where(predicate).ExecuteDeleteAsync() > 0;
+            }
+            catch (Exception) 
+            {
+                throw;
+            }
+            
+        }
+        public async Task<bool> DeleteAsync(IList<T> entities)
+        {
+            try
+            {
+                Entities.RemoveRange(entities);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

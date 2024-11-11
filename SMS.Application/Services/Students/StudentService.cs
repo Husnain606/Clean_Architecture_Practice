@@ -7,13 +7,13 @@ using SMS.Common.ViewModels;
 using SMS.Common.Constants;
 using SMS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using SMS.Application.Services.Students.Validators;
 using SMS.Application.Services.Common;
 using System.Linq.Dynamic.Core;
 using SMS.Common.Extensions;
 using AutoMapper.QueryableExtensions;
 using SMS.Application.Services.Account.Dto;
 using SMS.Application.Interfaces.Identity;
+using FluentValidation;
 
 namespace SMS.Application.Services.Students
 {
@@ -23,35 +23,28 @@ namespace SMS.Application.Services.Students
         private readonly IIdentityService _identityService;
         private readonly IMapper _mapper;
         private readonly ILogger<StudentService> _logger;
-        private readonly IApplicationDbContext _dbContext;
+        private readonly IApplicationDbContext _dbContext; 
+        private readonly IUserRoleService _userRole;
 
         public StudentService(IRepository<Student> studentRepository,
             IMapper mapper,
             ILogger<StudentService> logger,
             IApplicationDbContext dbContext,
-            IIdentityService identityService)
+            IIdentityService identityService,
+            IUserRoleService userRole)
         {
             _studentRepository = studentRepository;
             _mapper = mapper;
             _logger = logger;
             _dbContext = dbContext;
             _identityService = identityService;
+            _userRole = userRole;
         }
 
         // CREATE STUDENT
         public async Task<ResponseModel> CreateStudentAsync(CreateStudentDto studentModel)
         {
-            ResponseModel model = new ResponseModel();
-
-            // Validate the student model
-            var _validator = new StudentValidator();
-            var validationResult = await _validator.ValidateAsync(studentModel);
-            if (!validationResult.IsValid)
-            {
-                model.IsSuccess = false;
-                model.Messsage = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                return model;
-            }
+            ResponseModel<StudentDto> model = new ResponseModel<StudentDto>();
 
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
@@ -59,40 +52,41 @@ namespace SMS.Application.Services.Students
                 // Create a new ApplicationUser 
                 var applicationUser = new ApplicationUser
                 {
-                    UserName = studentModel.Mail, // Assuming the email is used as the username
+                    UserName = studentModel.FirstName+studentModel.LastName, // Assuming the email is used as the username
                     Email = studentModel.Mail,
                     CreatedAt = DateTime.Now,
+                  
                 };
-
-                // Create the user in the database
+                // Create the user in the Resultbase
                 CreateUserDto user = new CreateUserDto();
                 var result = await _identityService.CreateUserAsync(applicationUser, studentModel.Pasword);
                 if (!result.Succeeded)
                 {
-                    model.IsSuccess = false;
-                    model.Messsage = string.Join("; ", result.Errors.Select(e => e.Description));
+                    model.Successful = false;
+                    model.Message = string.Join("; ", result.Errors.Select(e => e.Description));
                     return model;
                 }
+                await _userRole.AssignRoleAsync(applicationUser.Id, "9595c536-8516-4d9a-872b-6f336e4e3716");
 
                 // Map the student model to the Student entity
                 var student = _mapper.Map<Student>(studentModel);
                 student.Id = Guid.NewGuid();
                 student.UserId = applicationUser.Id; // Associate the student with the created user
 
-                // Create the student in the database
-                var data = await _studentRepository.CreateAsync(student);
+                // Create the student in the Resultbase
+                var Result = await _studentRepository.CreateAsync(student);
+                model.Result = Result;
+                model.Successful = true;
+                model.Message = StudentConstants.successMessage;
                 await transaction.CommitAsync();
 
-                model.data = data;
-                model.IsSuccess = true;
-                model.Messsage = StudentConstants.successMessage;
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 _logger.LogError(ex, "Error occurred while creating student.");
-                model.IsSuccess = false;
-                model.Messsage = "An error occurred while creating the student.";
+                model.Successful = false;
+                model.Message = "An error occurred while creating the student.";
             }
 
             return model;
@@ -103,7 +97,6 @@ namespace SMS.Application.Services.Students
         {
             try
             {
-                ResponseModel responsemodel = new ResponseModel();
                 var paging = new GridDto<StudentDto>(); // Changed to StudentDto
                 _logger.LogInformation($"{nameof(GetStudentListAsync)} {ApplicationLogsConstants.MethodRunning}");
                 IQueryable<Student> students = GetStudentQuery(request);
@@ -117,7 +110,7 @@ namespace SMS.Application.Services.Students
                 _logger.LogInformation($"{nameof(StudentDto)} {ApplicationLogsConstants.MethodExecuted}");
 
                 // Return the result with StudentDto paging
-                return new ResponseModel<GridDto<StudentDto>> { IsSuccess = true, Result = paging };
+                return new ResponseModel<GridDto<StudentDto>> { Successful = true, Result =paging };
             }
             catch (Exception ex)
             {
@@ -130,7 +123,7 @@ namespace SMS.Application.Services.Students
         {
             return _studentRepository.TableNoTracking.TagWith("GetStudentQuery")
                   .OrderByIf(!string.IsNullOrEmpty(request.SortBy), request.SortBy!, request.SortOrder)
-                  .OrderByIf(string.IsNullOrEmpty(request.SortBy), x => x.StudentFirstName);
+                  .OrderByIf(string.IsNullOrEmpty(request.SortBy), x => x.FirstName);
         }
 
 
@@ -139,7 +132,7 @@ namespace SMS.Application.Services.Students
         {
             try
             {
-                ResponseModel model = new ResponseModel();
+                ResponseModel<StudentDto> model = new ResponseModel<StudentDto>();
                 var student = await _studentRepository.GetByIdAsync(studentId);
                 if (student == null)
                 {
@@ -149,8 +142,8 @@ namespace SMS.Application.Services.Students
                 var studentDTO = _mapper.Map<StudentRequestDto>(student);
                 //studentDTO.timespann = CheckTime.GetTimeDifference(student.EnrollmentDate);
 
-                model.data = studentDTO;
-                model.IsSuccess = true;
+                model.Result = studentDTO;
+                model.Successful = true;
                 model.StatusCode = System.Net.HttpStatusCode.OK;
                 return model;
             }
@@ -165,22 +158,15 @@ namespace SMS.Application.Services.Students
         public async Task<ResponseModel> UpdateStudentAsync(CreateStudentDto studentModel)
         {
             ResponseModel model = new ResponseModel();
-            var _validator = new StudentValidator();
-            var validationResult = await _validator.ValidateAsync(studentModel);
-            if (!validationResult.IsValid)
-            {
-                model.IsSuccess = false;
-                model.Messsage = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                return model;
-            }
+            
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
                 var student = await _studentRepository.GetByIdAsync(studentModel.Id);
                 if (student == null)
                 {
-                    model.IsSuccess = false;
-                    model.Messsage = StudentConstants.notFound;
+                    model.Successful = false;
+                    model.Message = StudentConstants.notFound;
                     _logger.LogInformation(StudentConstants.notFound, studentModel.Id);
                     return model;
                 }

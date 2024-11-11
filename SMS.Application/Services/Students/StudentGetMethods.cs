@@ -38,7 +38,7 @@ namespace SMS.Application.Services.Students
 
                 var result = studentsWithDepartments.Select(student => new StudentRequestDto
                 {
-                    Name = student.StudentFirstName,
+                    Name = student.FirstName,
                     Age = student.Age,
                     Department = student.Department.DepartmenrDescription
                 }).ToList();
@@ -64,7 +64,7 @@ namespace SMS.Application.Services.Students
 
                 var result = studentsWithDepartments.Select(student => new StudentRequestDto
                 {
-                    Name = student.StudentFirstName,
+                    Name = student.FirstName,
                     Age = student.Age,
                     Department = student.Department?.DepartmenrDescription ?? "No Department"
                 }).ToList();
@@ -83,11 +83,11 @@ namespace SMS.Application.Services.Students
         {
             try
             {
-                // Fetch the list of departments from the database
+                // Fetch the list of departments from the Resultbase
                 var departmentDTO = await _departmentServices.GetAllAsync();
                 var departments = _mapper.Map<List<Department>>(departmentDTO);
 
-                // Fetch the list of students from the database
+                // Fetch the list of students from the Resultbase
                 var students = await _studentRepository.Table.AsNoTracking().ToListAsync();
 
                 // Perform the right outer join in-memory (by swapping the tables)
@@ -97,7 +97,7 @@ namespace SMS.Application.Services.Students
                                      from stud in studentGroup.DefaultIfEmpty() // This ensures that all departments are included
                                      select new
                                      {
-                                         StudentFirstName = stud?.StudentFirstName,
+                                         FirstName = stud?.FirstName,
                                          Age = stud?.Age,
                                          DepartmentDescription = department.DepartmenrDescription
                                      };
@@ -105,7 +105,7 @@ namespace SMS.Application.Services.Students
                 // Map the results to StudentDto
                 var result = rightOuterJoin.Select(x => new StudentRequestDto
                 {
-                    Name = x.StudentFirstName ?? "No Student",
+                    Name = x.FirstName ?? "No Student",
                     Age = x.Age ?? 0,
                     Department = x.DepartmentDescription
                 }).ToList();
@@ -130,7 +130,7 @@ namespace SMS.Application.Services.Students
 
                 var result = studentsWithDepartments.Select(student => new StudentRequestDto
                 {
-                    Name = student.StudentFirstName,
+                    Name = student.FirstName,
                     Age = student.Age,
                     Department = student.Department.DepartmenrDescription
                 }).ToList();
@@ -160,14 +160,14 @@ namespace SMS.Application.Services.Students
                         student => student.DepartmentId,
                         (department, student) => new
                         {
-                            student.StudentFirstName,
+                            student.FirstName,
                             student.Age,
                             department.DepartmenrDescription
                         })
                     .ToList();
                 var result = innerJoin.Select(x => new StudentRequestDto
                 {
-                    Name = x.StudentFirstName,
+                    Name = x.FirstName,
                     Age = x.Age,
                     Department = x.DepartmenrDescription
                 }).ToList();
@@ -191,7 +191,7 @@ namespace SMS.Application.Services.Students
 
                 var result = studentsWithDepartments.Select(student => new StudentRequestDto
                 {
-                    Name = student.StudentFirstName,
+                    Name = student.FirstName,
                     Age = student.Age,
                     Department = student.Department?.DepartmenrDescription ?? "No Department"
                 }).ToList();
@@ -222,7 +222,7 @@ namespace SMS.Application.Services.Students
                         DepartmentId = group.Key,
                         Students = group.Select(student => new StudentRequestDto
                         {
-                            Name = student.StudentFirstName + " " + student.StudentLastName,
+                            Name = student.FirstName + " " + student.LastName,
                            // Mail = student.Mail,
                             Class = student.Class,
                             Contact = student.Contact,

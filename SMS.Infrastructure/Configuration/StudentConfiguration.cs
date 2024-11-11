@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SMS.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace SMS.Presistence.Configuration
 {
@@ -10,15 +10,15 @@ namespace SMS.Presistence.Configuration
         {
             builder.HasKey(s => s.Id);
 
-            builder.Property(s => s.StudentFirstName)
+            builder.Property(s => s.FirstName)
                 .IsRequired()
                 .HasMaxLength(30);
 
-            builder.Property(s => s.StudentLastName)
+            builder.Property(s => s.LastName)
                 .IsRequired()
                 .HasMaxLength(30);
 
-            builder.Property(s => s.StudentFatherName)
+            builder.Property(s => s.FatherName)
                 .IsRequired()
                 .HasMaxLength(30);
 
@@ -39,16 +39,7 @@ namespace SMS.Presistence.Configuration
             builder.HasIndex(s => s.Mail)
                 .IsUnique();
 
-            //builder.Property(s => s.Pasword)
-            //    .IsRequired()
-            //    .HasMaxLength(100); // Assuming maximum password length is 100 characters
-
-            //builder.HasIndex(s => s.Pasword)
-            //    .IsUnique();
-
-            //builder.Property(s => s.ConfirmPasword)
-            //    .IsRequired()
-            //    .HasMaxLength(100);
+            
 
             builder.Property(s => s.DepartmentId)
                 .IsRequired();

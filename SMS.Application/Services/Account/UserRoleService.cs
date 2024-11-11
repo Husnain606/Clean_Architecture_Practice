@@ -37,7 +37,7 @@ namespace SMS.Application.Services.Account
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
         }
-
+        
         // Remove a role from a user
         public async Task RemoveRoleAsync(string userId, string roleId)
         {
@@ -60,5 +60,6 @@ namespace SMS.Application.Services.Account
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
         }
+       
     }
 }

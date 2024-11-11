@@ -15,7 +15,7 @@ namespace SMS.Application.Mapping
 
             // Mapping from Teacher to TeacherDto and vice versa
             CreateMap<Teacher, TeacherDto>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.TeacherFirstName} {src.TeacherLastName}"))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"))
                 .ForMember(dest => dest.timespann, opt => opt.MapFrom(src => (DateTime.Now - src.HiringDate)))
                 .AddTransform<string>(n => string.IsNullOrEmpty(n) ? "Class not Found" : n)
                 .ReverseMap();

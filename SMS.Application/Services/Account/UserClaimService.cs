@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SMS.Application.Interfaces.Identity;
+using SMS.Application.Services.Account.Dto;
 using SMS.Domain.Entities;
 using System.Security.Claims;
 
@@ -14,13 +15,16 @@ namespace SMS.Application.Services.Account
             _userManager = userManager;
         }
 
-        public async Task<IdentityResult> AddClaimAsync(string userId, Claim claim)
+        public async Task<IdentityResult> AddClaimAsync(string userId, UserClaimDto claimDto)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 throw new Exception("User  not found.");
             }
+
+            // Create a Claim object from the DTO
+            var claim = new Claim(claimDto.ClaimType, claimDto.ClaimValue);
             return await _userManager.AddClaimAsync(user, claim);
         }
 

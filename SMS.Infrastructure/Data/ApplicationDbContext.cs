@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using SMS.Domain.Entities;
 using SMS.Application.Interfaces;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using SMS.Persistence.Configuration;
 using SMS.Presistence.Configuration;
+using SMS.Persistence.Configuration;
 
 namespace SMS.Infrastructure.Data
 {
@@ -23,22 +22,15 @@ namespace SMS.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Configure Student Entity
-            modelBuilder.Entity<Student>()
-                .HasOne(s => s.ApplicationUser)
-                .WithOne()
-                .HasForeignKey<Student>(s => s.UserId);
 
             modelBuilder.Entity<Student>()
-                .HasOne(s => s.Department)
-                .WithMany(d => d.Student)
-                .HasForeignKey(s => s.DepartmentId);
-
-            // Configure Teacher Entity
+           .HasOne(s => s.ApplicationUser)
+           .WithOne(a => a.Student)
+           .HasForeignKey<Student>(s => s.UserId); // Specify the foreign key
             modelBuilder.Entity<Teacher>()
-                .HasOne(t => t.ApplicationUser)
-                .WithOne()
-                .HasForeignKey<Teacher>(t => t.UserId);
+           .HasOne(s => s.ApplicationUser)
+           .WithOne(a => a.Teacher)
+           .HasForeignKey<Teacher>(s => s.UserId);
 
             // Apply entity configurations
             modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
@@ -46,37 +38,37 @@ namespace SMS.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
             modelBuilder.ApplyConfiguration(new TeacherConfiguration());
 
-            // Seed default roles
-            modelBuilder.Entity<IdentityRole>().HasData(
-                new IdentityRole { Id = "1", Name = "Student", NormalizedName = "STUDENT" },
-                new IdentityRole { Id = "2", Name = "Teacher", NormalizedName = "TEACHER" }
-            );
+        //    // Seed default roles
+        //    modelBuilder.Entity<IdentityRole>().HasData(
+        //        new IdentityRole { Id = "1", Name = "Student", NormalizedName = "STUDENT" },
+        //        new IdentityRole { Id = "2", Name = "Teacher", NormalizedName = "TEACHER" }
+        //    );
 
-            // Seed default ApplicationUser (Admin user)
-            var adminUser = new ApplicationUser
-            {
-                Id = "1",
-                UserName = "HusnainAhmed",
-                NormalizedUserName = "HUSNAINAHMED",
-                Email = "hasnain606@gmail.com",
-                NormalizedEmail = "HASNAIN606@GMAIL.COM",
-                EmailConfirmed = true
-            };
+        //    // Seed default ApplicationUser (Admin user)
+        //    var adminUser = new ApplicationUser
+        //    {
+        //        Id = "1",
+        //        UserName = "HusnainAhmed",
+        //        NormalizedUserName = "HUSNAINAHMED",
+        //        Email = "hasnain606@gmail.com",
+        //        NormalizedEmail = "HASNAIN606@GMAIL.COM",
+        //        EmailConfirmed = true
+        //    };
 
-            // Hash the password
-            var hasher = new PasswordHasher<ApplicationUser>();
-            adminUser.PasswordHash = hasher.HashPassword(adminUser, "NANI@606");
+        //    // Hash the password
+        //    var hasher = new PasswordHasher<ApplicationUser>();
+        //    adminUser.PasswordHash = hasher.HashPassword(adminUser, "NANI@606");
 
-            modelBuilder.Entity<ApplicationUser>().HasData(adminUser);
+        //    modelBuilder.Entity<ApplicationUser>().HasData(adminUser);
 
-            // Assign Admin role to the seeded Admin user
-            modelBuilder.Entity<IdentityUserRole<string>>().HasData(
-                new IdentityUserRole<string>
-                {
-                    UserId = "1", // Admin user Id
-                    RoleId = "1"  // Admin role Id
-                }
-            );
+        //    // Assign Admin role to the seeded Admin user
+        //    modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+        //        new IdentityUserRole<string>
+        //        {
+        //            UserId = "1", // Admin user Id
+        //            RoleId = "1"  // Admin role Id
+        //        }
+        //    );
         }
 
         // Expose the Database object for migrations

@@ -31,8 +31,8 @@ namespace SMS.Application.Services.Departments
             var validationResult = await _validator.ValidateAsync(DepartmentModel);
             if (!validationResult.IsValid)
             {
-                model.IsSuccess = false;
-                model.Messsage = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+                model.Successful = false;
+                model.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
                 return model;
             }
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
@@ -43,8 +43,8 @@ namespace SMS.Application.Services.Departments
                 model = await _departmentRepository.CreateAsync(department);
                 await transaction.CommitAsync();
 
-                model.IsSuccess = true;
-                model.Messsage = "Department Created Successfully";
+                model.Successful = true;
+                model.Message = "Department Created Successfully";
             }
             catch (Exception ex)
             {
@@ -104,8 +104,8 @@ namespace SMS.Application.Services.Departments
                 var department = await _departmentRepository.GetByIdAsync(DepartmentModel.Id);
                 if (department == null)
                 {
-                    model.IsSuccess = false;
-                    model.Messsage = $"Department Not Found with ID = {DepartmentModel.Id}!!";
+                    model.Successful = false;
+                    model.Message = $"Department Not Found with ID = {DepartmentModel.Id}!!";
                     _logger.LogInformation("Department Not Found with ID = {0}!!", DepartmentModel.Id);
                     return model;
                 }
@@ -136,8 +136,8 @@ namespace SMS.Application.Services.Departments
             {
                 await transaction.RollbackAsync();
                 _logger.LogError(ex, "Error occurred while deleting department.");
-                model.IsSuccess = false;
-                model.Messsage = "Error occurred while deleting department.";
+                model.Successful = false;
+                model.Message = "Error occurred while deleting department.";
             }
             return model;
         }

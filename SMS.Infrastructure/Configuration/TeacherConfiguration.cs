@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SMS.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace SMS.Presistence.Configuration
 {
@@ -10,15 +10,15 @@ namespace SMS.Presistence.Configuration
         {
             builder.HasKey(t => t.Id);
 
-            builder.Property(t => t.TeacherFirstName)
+            builder.Property(t => t.FirstName)
                 .IsRequired()
                 .HasMaxLength(50);
 
-            builder.Property(t => t.TeacherLastName)
+            builder.Property(t => t.LastName)
                 .IsRequired()
                 .HasMaxLength(50);
 
-            builder.Property(t => t.TeacherFatherName)
+            builder.Property(t => t.FatherName)
                 .IsRequired()
                 .HasMaxLength(50);
 

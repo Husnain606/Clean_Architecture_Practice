@@ -1,4 +1,4 @@
-﻿namespace SMS.Common
+﻿namespace SMS.Common.Enum
 {
     public enum EntityTypeEnum
     {

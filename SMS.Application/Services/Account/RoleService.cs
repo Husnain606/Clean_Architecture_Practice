@@ -41,6 +41,7 @@ namespace SMS.Application.Services.Account
             if (role != null)
             {
                 role.Name = roleDto.Name;
+                role.ConcurrencyStamp = roleDto.ConcurrencyStamp;
                 await _roleManager.UpdateAsync(role);
             }
         }

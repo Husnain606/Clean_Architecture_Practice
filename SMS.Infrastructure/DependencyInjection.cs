@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;  // Added this for IConfiguration
 using Microsoft.Extensions.DependencyInjection;  // Added this for AddDbContextCheck
 using SMS.Application.Interfaces;
@@ -8,18 +7,17 @@ using SMS.Application.Interfaces.Identity;
 using SMS.Domain.Entities;
 using SMS.Infrastructure.Data;
 using SMS.Infrastructure.Repositories.Base;
-using SMS.Presistence.Repositories;
 using SMS.IdentityService.Services;
 
 namespace SMS.Presistence
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddPlanningPortalPersistence(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddSMSPersistence(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("PlanningPortalConnection"),
+                options.UseSqlServer(configuration.GetConnectionString("SMSConnection"),
                       b =>
                       {
                           b.CommandTimeout(300);
@@ -49,20 +47,13 @@ namespace SMS.Presistence
 
         public static void ResolveRepositories(this IServiceCollection services)
         {
-            services.AddScoped<IPlanningPortalRepository<EntityType>, PlanningPortalRepository<EntityType>>();
-            services.AddScoped<IPlanningPortalRepository<UserConfiguration>, PlanningPortalRepository<UserConfiguration>>();
-            services.AddScoped<IPlanningPortalRepository<ConfigurationSchema>, PlanningPortalRepository<ConfigurationSchema>>();
-            services.AddScoped<IPlanningPortalRepository<ApplicationUser>, PlanningPortalRepository<ApplicationUser>>();
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+              services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(IApplicationDbContext), typeof(ApplicationDbContext));
             services.AddScoped<IIdentityService, SMS.IdentityService.Services.IdentityService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
         }
 
-        //public static void ResolveServices(this IServiceCollection services)
-        //{
-            
-        //}
+      
     }
 }

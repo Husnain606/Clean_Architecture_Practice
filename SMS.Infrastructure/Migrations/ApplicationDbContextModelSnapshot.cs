@@ -2,8 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SMS.Infrastructure.Data;
 
 #nullable disable
@@ -274,7 +272,7 @@ namespace SMS.Presistence.Migrations
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "302af87b-4d07-4de5-b207-1beed39e5f91",
+                            ConcurrencyStamp = "e463ee71-2ae5-4fc1-932a-f37399176ec4",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "hasnain606@gmail.com",
                             EmailConfirmed = true,
@@ -282,9 +280,9 @@ namespace SMS.Presistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "HASNAIN606@GMAIL.COM",
                             NormalizedUserName = "HUSNAINAHMED",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP3rmtkrGrl3J15x1CSQQMb2aPqMfz78Uzo09QoVvjZKYeNh7dbWsd4SC0iEYAbN7g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEK55QG4ruVRr2tVQlVtd49An0NRsT09zQjrayi4Jeq1YJThdOAvP8WHV5O+ethJNug==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4db94f94-32cf-4374-b405-33eecd051447",
+                            SecurityStamp = "09fe7fb8-5b8f-4d61-a0f8-a3aca92a98dd",
                             TwoFactorEnabled = false,
                             UserName = "HusnainAhmed"
                         });
@@ -334,25 +332,25 @@ namespace SMS.Presistence.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FatherName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<string>("Mail")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("StudentFatherName")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("StudentFirstName")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("StudentLastName")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -392,8 +390,23 @@ namespace SMS.Presistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FatherName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<DateTime>("HiringDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Mail")
                         .IsRequired()
@@ -402,21 +415,6 @@ namespace SMS.Presistence.Migrations
 
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("TeacherFatherName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("TeacherFirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("TeacherLastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UserId")
                         .IsRequired()

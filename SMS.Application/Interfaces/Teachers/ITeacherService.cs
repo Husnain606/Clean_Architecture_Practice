@@ -5,11 +5,12 @@ namespace SMS.Application.Interfaces.Teachers
 {
     public interface ITeacherService
     {
-        Task<List<TeacherDto>> GetTeacherListAsync();
-        Task<TeacherDto> GetTeacherDetailsByIdAsync(Guid teacherId);
+       
+        Task<ResponseModel<List<TeacherDto>>> GetTeacherListAsync();
+        Task<ResponseModel<TeacherDto>> GetTeacherDetailsByIdAsync(Guid teacherId);
         Task<ResponseModel> CreateTeacherAsync(CreateTeacherDto teacherModel);
         Task<ResponseModel> UpdateTeacherAsync(CreateTeacherDto teacherModel);
         Task<ResponseModel> DeleteTeacherAsync(Guid teacherId);
-        Task<List<TeacherDto>> GetTeacherDetailsByCNICAsync(string cnic);
+        Task<ResponseModel<List<TeacherDto>>> GetTeacherDetailsByCNICAsync(string cnic);
     }
 }
