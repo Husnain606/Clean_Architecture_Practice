@@ -1,21 +1,25 @@
 using FluentValidation.AspNetCore;
 using IdentityService.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using SMS.Application;
+using SMS.Application.Interfaces.Accounts;
 using SMS.Domain.Entities;
 using SMS.Infrastructure.Data;
 using SMS.Presistence;
+using SMS.Presistence.Data;
 using System.Text;
 
 internal class Program
 {
     [Obsolete]
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +38,7 @@ internal class Program
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+       
         // Add Application Services
         builder.Services.AddApplication(); // Ensure this extension method is defined
         builder.Services.AddSMSPersistence(builder.Configuration);
@@ -109,6 +114,32 @@ internal class Program
 
         var app = builder.Build();
 
+        // Seed the database
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            try
+            {
+                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                var dbContext = services.GetRequiredService<ApplicationDbContext>();
+
+                if (dbContext.Database.IsSqlServer())
+                {
+                    await dbContext.Database.MigrateAsync();
+                }
+
+                await ApplicationDbContextSeed.SeedAsync(dbContext, userManager, roleManager);
+                logger.LogInformation("Database seeded successfully.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+                throw;
+            }
+        }
+
         // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
         {
@@ -138,4 +169,5 @@ internal class Program
 
         app.Run();  // Start the application
     }
+    
 }

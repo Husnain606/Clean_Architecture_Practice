@@ -29,6 +29,10 @@ namespace SMS.Application.Services.Account
         {
             return await _roleManager.FindByIdAsync(roleId);
         }
+        public async Task<IdentityRole> GetRoleByNameAsync(string roleName)
+        {
+            return await _roleManager.FindByNameAsync(roleName);
+        }
 
         public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
         {

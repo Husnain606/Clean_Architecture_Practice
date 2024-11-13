@@ -6,6 +6,7 @@ namespace SMS.Application.Interfaces.Identity
     {
         Task<IdentityRole> CreateRoleAsync(CreateRoleDto roleDto);
         Task<IdentityRole> GetRoleByIdAsync(string roleId);
+        Task<IdentityRole> GetRoleByNameAsync(string roleName);
         Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
         Task UpdateRoleAsync(string roleId, UpdateRoleDto roleDto);
         Task DeleteRoleAsync(string roleId);

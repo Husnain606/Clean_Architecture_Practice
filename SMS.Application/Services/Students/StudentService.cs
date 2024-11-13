@@ -14,6 +14,8 @@ using AutoMapper.QueryableExtensions;
 using SMS.Application.Services.Account.Dto;
 using SMS.Application.Interfaces.Identity;
 using FluentValidation;
+using SMS.Common.Enum.Database;
+using Microsoft.AspNetCore.Identity;
 
 namespace SMS.Application.Services.Students
 {
@@ -25,13 +27,15 @@ namespace SMS.Application.Services.Students
         private readonly ILogger<StudentService> _logger;
         private readonly IApplicationDbContext _dbContext; 
         private readonly IUserRoleService _userRole;
+        private readonly IRoleService _role;
 
         public StudentService(IRepository<Student> studentRepository,
             IMapper mapper,
             ILogger<StudentService> logger,
             IApplicationDbContext dbContext,
             IIdentityService identityService,
-            IUserRoleService userRole)
+            IUserRoleService userRole,
+            IRoleService role)
         {
             _studentRepository = studentRepository;
             _mapper = mapper;
@@ -39,35 +43,17 @@ namespace SMS.Application.Services.Students
             _dbContext = dbContext;
             _identityService = identityService;
             _userRole = userRole;
+            _role = role;
         }
 
         // CREATE STUDENT
         public async Task<ResponseModel> CreateStudentAsync(CreateStudentDto studentModel)
         {
             ResponseModel<StudentDto> model = new ResponseModel<StudentDto>();
-
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
-                // Create a new ApplicationUser 
-                var applicationUser = new ApplicationUser
-                {
-                    UserName = studentModel.FirstName+studentModel.LastName, // Assuming the email is used as the username
-                    Email = studentModel.Mail,
-                    CreatedAt = DateTime.Now,
-                  
-                };
-                // Create the user in the Resultbase
-                CreateUserDto user = new CreateUserDto();
-                var result = await _identityService.CreateUserAsync(applicationUser, studentModel.Pasword);
-                if (!result.Succeeded)
-                {
-                    model.Successful = false;
-                    model.Message = string.Join("; ", result.Errors.Select(e => e.Description));
-                    return model;
-                }
-                await _userRole.AssignRoleAsync(applicationUser.Id, "9595c536-8516-4d9a-872b-6f336e4e3716");
-
+                var applicationUser = await CreateUserAssignRoles(studentModel);
                 // Map the student model to the Student entity
                 var student = _mapper.Map<Student>(studentModel);
                 student.Id = Guid.NewGuid();
@@ -90,6 +76,39 @@ namespace SMS.Application.Services.Students
             }
 
             return model;
+        }
+        public async Task<ApplicationUser> CreateUserAssignRoles(CreateStudentDto studentModel) 
+        {
+            try
+            {
+                // Create a new ApplicationUser 
+                var applicationUser = new ApplicationUser
+                {
+                    UserName = studentModel.FirstName + studentModel.LastName, // Assuming the email is used as the username
+                    Email = studentModel.Mail,
+                    CreatedAt = DateTime.Now,
+
+                };
+                // Create the user in the Resultbase
+                CreateUserDto user = new CreateUserDto();
+
+                var result = await _identityService.CreateUserAsync(applicationUser, studentModel.Pasword);
+                if (!result.Succeeded)
+                {
+                    //model.Successful = false;
+                    //model.Message = string.Join("; ", result.Errors.Select(e => e.Description));
+                    //return model;
+                }
+                var roles = await _role.GetRoleByNameAsync("Student");
+                await _userRole.AssignRoleAsync(applicationUser.Id, roles.Id);
+                return applicationUser;
+
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Error occurred while creating User.");
+                throw;
+            }
         }
 
         // GET THE LIST OF ALL STUDENTS WITH PAGINATION
