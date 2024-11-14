@@ -12,5 +12,6 @@ namespace SMS.Application.Services.Students.Dto
         public string? Contact { get; set; } = string.Empty;
         public string? Department { get; set; } = string.Empty;
         public string? timespann { get; set; } = null;
+        public string? searchTerm { get; set; }
     }
 }

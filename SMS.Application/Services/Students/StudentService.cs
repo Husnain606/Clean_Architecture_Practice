@@ -16,6 +16,8 @@ using SMS.Application.Interfaces.Identity;
 using FluentValidation;
 using SMS.Common.Enum.Database;
 using Microsoft.AspNetCore.Identity;
+using MailKit.Search;
+using System.Diagnostics;
 
 namespace SMS.Application.Services.Students
 {
@@ -112,24 +114,54 @@ namespace SMS.Application.Services.Students
         }
 
         // GET THE LIST OF ALL STUDENTS WITH PAGINATION
+        //public async Task<ResponseModel<GridDto<StudentDto>>> GetStudentListAsync(StudentRequestDto request)
+        //{
+        //    try
+        //    {
+        //        var paging = new GridDto<StudentDto>(); // Changed to StudentDto
+        //        _logger.LogInformation($"{nameof(GetStudentListAsync)} {ApplicationLogsConstants.MethodRunning}");
+        //        IQueryable<Student> students = GetStudentQuery(request); 
+        //        _logger.LogInformation("Getting all the students executed with pagination !!");
+
+        //        paging.TotalRecords = await students.CountAsync();
+        //        paging.Data = await students.PageBy(request.PageNumber, request.PageSize)
+        //            .ProjectTo<StudentDto>(_mapper.ConfigurationProvider).ToListAsync();
+        //        _logger.LogInformation($"{nameof(StudentDto)} {ApplicationLogsConstants.MethodExecuted}");
+
+        //        // Return the result with StudentDto paging
+        //        return new ResponseModel<GridDto<StudentDto>> { Successful = true, Result =paging };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error occurred while getting student list.");
+        //        throw;
+        //    }
+        //}
         public async Task<ResponseModel<GridDto<StudentDto>>> GetStudentListAsync(StudentRequestDto request)
         {
             try
             {
                 var paging = new GridDto<StudentDto>(); // Changed to StudentDto
                 _logger.LogInformation($"{nameof(GetStudentListAsync)} {ApplicationLogsConstants.MethodRunning}");
-                IQueryable<Student> students = GetStudentQuery(request);
-                _logger.LogInformation("Getting all the students executed with pagination !!");
+
+                IQueryable<Student> students = _dbContext.Student.AsQueryable();
+
+                students = students.ApplyFiltering 
+                    (
+                        request.searchTerm
+                        //student => Age == null || student.Age >=10
+                    );
 
                 paging.TotalRecords = await students.CountAsync();
-                paging.Data = await students.PageBy(request.PageNumber, request.PageSize)
-                    .ProjectTo<StudentDto>(_mapper.ConfigurationProvider).ToListAsync();
-
+                paging.Data = await students
+                    .PageBy(request.PageNumber, request.PageSize)
+                    .ProjectTo<StudentDto>(_mapper.ConfigurationProvider)
+                    .ToListAsync();
 
                 _logger.LogInformation($"{nameof(StudentDto)} {ApplicationLogsConstants.MethodExecuted}");
 
                 // Return the result with StudentDto paging
-                return new ResponseModel<GridDto<StudentDto>> { Successful = true, Result =paging };
+                return new ResponseModel<GridDto<StudentDto>> { Successful = true, Result = paging };
             }
             catch (Exception ex)
             {
@@ -137,6 +169,7 @@ namespace SMS.Application.Services.Students
                 throw;
             }
         }
+
 
         private IQueryable<Student> GetStudentQuery(StudentRequestDto request)
         {

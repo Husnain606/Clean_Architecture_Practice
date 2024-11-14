@@ -80,5 +80,19 @@ namespace SMS.Common.Extensions
 
             return query;
         }
+        public static IQueryable<T> ApplyFiltering<T>(this IQueryable<T> query, string searchTerm, Func<T, bool> filterCondition = null)
+        {
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(item => item.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (filterCondition != null)
+            {
+                query = query.Where(filterCondition).AsQueryable();
+            }
+
+            return query;
+        }
     }
 }
